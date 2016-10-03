@@ -1,3 +1,0 @@
-git rm -r --cached node_modules
-git commit -m "Remove node_modules now that they're ignored!"
-git push origin master

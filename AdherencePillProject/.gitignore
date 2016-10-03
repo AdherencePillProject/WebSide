@@ -4,3 +4,7 @@ logs
 
 # node module
 node_modules
+
+git rm -r --cached node_modules
+git git commit -m "Remove node_modules now that they're ignored!"
+git push origin master

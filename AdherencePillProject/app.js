@@ -4,7 +4,6 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var ParseServer = require('parse-server').ParseServer;
 
 var routes = require('./routes/index');
 var user = require('./routes/user');
@@ -19,31 +18,6 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.set('json spaces', 40);
-
-//CORS middleware
-var allowCrossDomain = function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type,X-Parse-Application-Id');
-
-    next();
-};
-app.use(allowCrossDomain);
-
-// Set Parse Server env
-var databaseUri = process.env.DATABASE_URI || process.env.MONGODB_URI;
-var api = new ParseServer({
-  databaseURI: databaseUri || 'mongodb://localhost:27017/adherence',
-  cloud: process.env.CLOUD_CODE_MAIN || './cloud/main.js',
-  appId: process.env.APP_ID || 'myAppId',
-  masterKey: process.env.MASTER_KEY || 'myMasterKey',
-  serverURL: process.env.SERVER_URL || 'http://localhost:5000/parse',
-  liveQuery: {
-    classNames: ["Posts", "Comments"]
-  }
-});
-var mountPath = process.env.PARSE_MOUNT || '/parse';
-app.use(mountPath, api);
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));

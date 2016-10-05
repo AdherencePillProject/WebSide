@@ -5,14 +5,14 @@
  */
 
 var app = require('../app');
-var debug = require('debug')('AdherencePillProject:server');
+var debug = require('debug')('SHvsMK.com:server');
 var http = require('http');
-var ParseServer = require('parse-server').ParseServer;
+
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '5000');
+var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
@@ -28,7 +28,7 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-ParseServer.createLiveQueryServer(server);
+
 /**
  * Normalize a port into a number, string, or false.
  */

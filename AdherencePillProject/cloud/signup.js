@@ -8,14 +8,19 @@ Parse.Cloud.define('signup', function(req, res) {
   //var lastName = req.body.lastname;
   //var gender = req.body.gender;
 
-  var patient = new Parse.Object('Patient');
+  var patient = new Parse.Object('X');
   patient.add('name', 'hahahah');
+  console.log('*****');
+  console.log(req);
+  console.log('*****');
+  console.log(req.body.name);
   patient.save(null, {
     success: function error(patient) {
-      console.log('yes');
+      console.log(req);
+      console.log('hah entry add success');
     },
     error: function error(err) {
-      console.log(err);
+      console.log('entry add fail');
     }
   });
   res.success('success');

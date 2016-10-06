@@ -11,6 +11,7 @@ var user = require('./routes/user');
 var doctor = require('./routes/doctor');
 var patient = require('./routes/patient');
 var pharmacy = require('./routes/pharmacy');
+var prescription = require('./routes/prescription');
 var tests = require('./routes/tests');
 
 var config = require('./config');
@@ -58,6 +59,7 @@ app.use('/', routes);
 app.use('/user', user);
 app.use('/patient', patient);
 app.use('/doctor', doctor);
+app.use('/prescription', prescription);
 app.use('/pharmacy', pharmacy);
 app.use('/test', tests);
 

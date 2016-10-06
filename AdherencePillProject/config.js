@@ -1,6 +1,6 @@
 var config = {
     Parse: {
-        databaseURI: 'mongodb://129.105.36.93:27017/adherence',
+        databaseURI: 'mongodb://129.105.36.93:27017/AdherencePillProject',
         cloud: './cloud/index.js',
         appId: 'AdherencePillProject',
         masterKey: 'AdherenceServer',

@@ -63,7 +63,7 @@ ParseRequest.postData = function() {
       e.preventDefault();
     });
   });
-  XHR.POST('/parse/classes/GameScore');
+  XHR.POST('/patient');
 }
 
 ParseRequest.getData = function() {

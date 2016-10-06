@@ -13,6 +13,8 @@ var patient = require('./routes/patient');
 var pharmacy = require('./routes/pharmacy');
 var tests = require('./routes/tests');
 
+var config = require('./config');
+
 var app = express();
 
 // view engine setup
@@ -33,14 +35,12 @@ app.use(allowCrossDomain);
 // Set Parse Server env
 var databaseUri = process.env.DATABASE_URI || process.env.MONGODB_URI;
 var api = new ParseServer({
-  databaseURI: databaseUri || 'mongodb://localhost:27017/adherence',
-  cloud: process.env.CLOUD_CODE_MAIN || './cloud/main.js',
-  appId: process.env.APP_ID || 'myAppId',
-  masterKey: process.env.MASTER_KEY || 'myMasterKey',
-  serverURL: process.env.SERVER_URL || 'http://localhost:5000/parse',
-  liveQuery: {
-    classNames: ["Posts", "Comments"]
-  }
+  databaseURI: databaseUri || config.Parse.databaseURI,
+  cloud: process.env.CLOUD_CODE_MAIN || config.Parse.cloud,
+  appId: process.env.APP_ID || config.Parse.appId,
+  masterKey: process.env.MASTER_KEY || config.Parse.masterKey,
+  serverURL: process.env.SERVER_URL || config.Parse.serverURL,
+  liveQuery: config.Parse.liveQuery
 });
 var mountPath = process.env.PARSE_MOUNT || '/parse';
 app.use(mountPath, api);

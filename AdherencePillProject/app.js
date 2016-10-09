@@ -8,6 +8,7 @@ var ParseServer = require('parse-server').ParseServer;
 
 var routes = require('./routes/index');
 var user = require('./routes/user');
+var login = require('./routes/login');
 var doctor = require('./routes/doctor');
 var patient = require('./routes/patient');
 var pharmacy = require('./routes/pharmacy');
@@ -33,7 +34,7 @@ app.use(allowCrossDomain);
 // Set Parse Server env
 var databaseUri = process.env.DATABASE_URI || process.env.MONGODB_URI;
 var api = new ParseServer({
-  databaseURI: databaseUri || 'mongodb://localhost:27017/adherence',
+  databaseURI: process.env.DATABASE_URI || 'mongodb://localhost:27017/adherence',
   cloud: process.env.CLOUD_CODE_MAIN || './cloud/main.js',
   appId: process.env.APP_ID || 'myAppId',
   masterKey: process.env.MASTER_KEY || 'myMasterKey',
@@ -56,6 +57,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/user', user);
+app.use('/login', login);
 app.use('/patient', patient);
 app.use('/doctor', doctor);
 app.use('/pharmacy', pharmacy);
@@ -63,12 +65,13 @@ app.use('/test', tests);
 
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error();
-  err.status = 404;
-  res.json({
-    'message': 'path ' + req.originalUrl + ' Not Found'
-  })
+app.use(function(err, req, res, next) {
+
+  if (err.status == 404) {
+    res.json({
+      'message': 'path ' + req.originalUrl + ' Not Found'
+    })
+  }
 });
 
 // error handlers

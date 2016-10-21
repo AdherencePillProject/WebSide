@@ -20,6 +20,7 @@ router.post('/', function(req, res, next) {
   newUser.set("firstname", req.body.firstname);
   newUser.set("lastname", req.body.lastname);
   newUser.set("gender", req.body.gender);
+  newUser.set("type", "Patient");
 
   // TODO: Check if registered before
 

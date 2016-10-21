@@ -5,6 +5,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var ParseServer = require('parse-server').ParseServer;
+var dotenv = require('dotenv');
+dotenv.load();
 
 var routes = require('./routes/index');
 var user = require('./routes/user');
@@ -30,9 +32,7 @@ var allowCrossDomain = function(req, res, next) {
     next();
 };
 app.use(allowCrossDomain);
-
 // Set Parse Server env
-var databaseUri = process.env.DATABASE_URI || process.env.MONGODB_URI;
 var api = new ParseServer({
   databaseURI: process.env.DATABASE_URI || 'mongodb://localhost:27017/adherence',
   cloud: process.env.CLOUD_CODE_MAIN || './cloud/main.js',

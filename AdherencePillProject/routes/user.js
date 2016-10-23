@@ -7,15 +7,24 @@ router.get('/', function(req, res, next) {
   Parse.User.become(sessionToken, {
     success: function() {
       var user = Parse.User.current();
+      console.log(user);
       if (user) {
+        var type = 0;
+        if (user.get("patientPointer") !== undefined) {
+          type += 1;
+        }
+        if (user.get("doctorPointer") !== undefined) {
+          type += 10;
+        }
         res.status(200).json({
           code: 1,
-          email: user.attributes.email,
-          firstname: user.attributes.firstname,
-          lastname: user.attributes.lastname,
-          phone: user.attributes.phone,
-          gender: user.attributes.gender,
-          type: user.attributes.type
+          email: user.get("email"),
+          firstname: user.get("firstname"),
+          lastname: user.get("lastname"),
+          phone: user.get("phone"),
+          gender: user.get("gender"),
+          dateOfBirth: user.get("dateOfBirth"),
+          type: type,
         });
       }
       else {

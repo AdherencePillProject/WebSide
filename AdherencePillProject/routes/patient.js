@@ -20,7 +20,7 @@ router.post('/', function(req, res, next) {
   newUser.set("firstname", req.body.firstname);
   newUser.set("lastname", req.body.lastname);
   newUser.set("gender", req.body.gender);
-  newUser.set("type", "Patient");
+  newUser.set("dateOfBirth", {__type: "Date", iso: req.body.dob}); //be careful with timezone
 
   // TODO: Check if registered before
 
@@ -30,6 +30,11 @@ router.post('/', function(req, res, next) {
       addPatient(user, {
         success: function (patient) {
           console.log("Patient " + patient.id + " saved");
+          user.set("patientPointer", patient);
+          user.save(null, {
+            success: function() {},
+            error: function(error) {console.log(error);}
+          });
           Parse.User.logIn(req.body.email, req.body.password, {
             success: function(user) {
               console.log(user);

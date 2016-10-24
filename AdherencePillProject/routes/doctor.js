@@ -2,9 +2,37 @@ var express = require('express');
 var router = express.Router();
 
 /* GET users listing. */
-// router.get('/', function(req, res, next) {
-//   res.send('respond with a resource');
-// });
+router.get('/', function(req, res, next) {
+  var sessionToken = req.get("x-parse-session-token");
+  Parse.User.become(sessionToken, {
+    success: function() {
+      var doctors = Parse.Object.extend("Doctor");
+      var users = Parse.Object.extend("_User");
+      var user = new users();
+      var Query = new Parse.Query(doctors);
+      Query.select("hospitalName", "hospitalAddress", "hospitalCity",
+        "user.firstname", "user.lastname", "user.email");
+      Query.exists("hospitalName");
+      Query.include("user");
+      Query.notEqualTo("hospitalName", "");
+      Query.find({
+        success: function(results) {
+          results.forEach(function(doctor) {
+            console.log(doctor.get("user"));
+          });
+          res.status(200).json(results);
+        },
+        error: function(error) {
+          res.status(200).json({});
+        }
+      });
+    },
+    error: function(error) {
+      res.status(401)
+        .json({"code": error.code, "message": error.message});
+    }
+  });
+});
 router.post('/', function(req, res, next) {
   console.log(req);
   var newUser = new Parse.User();

@@ -25,6 +25,8 @@ router.get('/', function(req, res, next) {
           gender: user.get("gender"),
           dateOfBirth: user.get("dateOfBirth"),
           type: type,
+          patientPointer: user.get("patientPointer"),
+          doctorPointer: user.get("doctorPointer")
         });
       }
       else {
@@ -37,27 +39,7 @@ router.get('/', function(req, res, next) {
         .json({"code": error.code, "message": error.message});
     }
   })
-  // Parse.Session.current().then(
-  //   function(session) {
-  //     var user = Parse.User.current();
-  //     if (user) {
-  //       res.status(200).json({
-  //         code: 1,
-  //         email: user.attributes.email,
-  //         firstname: user.attributes.firstname,
-  //         lastname: user.attributes.lastname,
-  //         gender: user.attributes.gender
-  //       });
-  //     }
-  //     else {
-  //       res.status(401)
-  //         .json({code: 101, messgae: "Invalid session"});
-  //     }
-  //   },
-  //   function(error) {
-  //     res.status(401)
-  //       .json({code: 101, messgae: "Invalid session"});
-  //   });
+
 });
 router.post('/', function(req, res, next) {
   console.log(req);

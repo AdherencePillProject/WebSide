@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
-
+var utility = require('./utility');
+var addPatient = utility.addPatient;
+var addPatientDoctorRelation = utility.addPatientDoctorRelation;
 /* GET users listing. */
 // router.get('/', function(req, res, next) {
 //   var user = new Parse.User();
@@ -88,7 +90,14 @@ router.post('/appointment', function(req, res, next) {
               appointment.set("time", {__type: "Date", iso: req.body.date});
               appointment.save(null, {
                 success: function(appointment) {
-                  res.status(200).json({code: 1});
+                  addPatientDoctorRelation(patient, doctor, {
+                    success: function(relation) {
+                      res.status(200).json({code: 1});
+                    },
+                    error: function(error) {
+                      res.status(400).json(error);
+                    }
+                  })
                 },
                 error: function(appointment, error) {
                   res.status(400).json(error);
@@ -166,18 +175,5 @@ router.get('/appointment', function(req, res, next) {
     }
   })
 });
-
-function addPatient(user, callback) {
-  var newPatient = new Parse.Object("Patient");
-  newPatient.set("user", user);
-  newPatient.save(null ,{
-    success: function (patient) {
-      return callback.success(patient);
-    },
-    error: function (patient, error) {
-      return callback.error(error);
-    }
-  })
-}
 
 module.exports = router;

@@ -44,7 +44,8 @@ exports.signUpUser = function(userInfo, type, callback) {
       addPerson({user: user, addtionInfo: userInfo}, type, {
         success: function (person) {
           console.log(type + " " + person.id + " saved");
-          var pointer = type + "Pointer";
+          var pointer = type.toLowerCase() + "Pointer";
+          console.log(pointer);
           user.set(pointer, person);
           user.save(null, {
             success: function() {},

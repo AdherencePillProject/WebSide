@@ -11,6 +11,7 @@ dotenv.load();
 var routes = require('./routes/index');
 var user = require('./routes/user');
 var login = require('./routes/login');
+var logout = require('./routes/logout');
 var doctor = require('./routes/doctor');
 var patient = require('./routes/patient');
 var pharmacy = require('./routes/pharmacy');

@@ -12,7 +12,8 @@ var addPatientDoctorRelation = utility.addPatientDoctorRelation;
 router.post('/', function(req, res, next) {
   signUpUser(req.body, "Patient", {
     success: function success (user) {
-      res.status(201).json({"code": 1, "sessionToken": user.attributes.sessionToken});
+      var sessionToken = user.getSessionToken();
+      res.status(201).json({"code": 1, "sessionToken": sessionToken});
     },
     error: function error (error) {
       res.status(400)

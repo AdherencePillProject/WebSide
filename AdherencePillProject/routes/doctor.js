@@ -97,24 +97,42 @@ router.get('/patients', function(req, res, next) {
       query.equalTo("user", _user);
       query.first({
         success: function(doctor) {
-          var relation = Parse.Object.extend("PatientDoctor");
-          var doctors = Parse.Object.extend("Doctor");
-          var _doctor = new doctors();
-          _doctor.id = doctor.id;
-          // query.select("", "", "patient.user.firstname", "patient.user.lastname",
-            // "patient.user.dateOfBirth", "patient.user.phone");
-          var query = new Parse.Query(relation);
-          query.include("patient");
+          if (doctor === undefined) {
+            res.status(401).json({code:201, message:"Invalid session"});
+          }
+          else {
+            var relation = Parse.Object.extend("PatientDoctor");
+            var doctors = Parse.Object.extend("Doctor");
+            var _doctor = new doctors();
+            _doctor.id = doctor.id;
+            // query.select("", "", "patient.user.firstname", "patient.user.lastname",
+              // "patient.user.dateOfBirth", "patient.user.phone");
+            var query = new Parse.Query(relation);
+            query.include("patient");
+            query.include("patient.user");
+            query.equalTo("doctor", _doctor);
+            query.find({
+              success: function(results) {
+                var ret = new Array();
+                for (var i=0; i<results.length; i++) {
+                  ret.push({
+                    patientFirstName: results[i].get("patient").get("user").get("firstname"),
+                    patientLastName: results[i].get("patient").get("user").get("lastname"),
+                    patientDateOfBirth: results[i].get("patient").get("user").get("dateOfBirth"),
+                    patientPhone: results[i].get("patient").get("user").get("phone"),
+                    patientEmail: results[i].get("patient").get("user").get("email"),
+                    patientGender: results[i].get("patient").get("user").get("gender"),
+                    patientId: results[i].get("patient").id
+                  });
+                }
+                res.status(200).json(ret);
+              },
+              error: function(error) {
+                res.status(400).json(error);
+              }
+            })
+          }
 
-          query.equalTo("doctor", _doctor);
-          query.find({
-            success: function(results) {
-              console.log(results);
-            },
-            error: function(error) {
-              res.status(400).json(error);
-            }
-          })
         },
         error: function(error) {
           res.status(400).json(error);

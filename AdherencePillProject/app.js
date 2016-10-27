@@ -27,7 +27,7 @@ app.set('json spaces', 40);
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type,X-Parse-Application-Id');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,X-Parse-Application-Id,X-Parse-Session-Token');
 
     next();
 };

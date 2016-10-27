@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var utility = require('./utility');
-var addDoctor = utility.addDoctor;
+var signUpUser = utility.signUpUser;
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -36,51 +36,16 @@ router.get('/', function(req, res, next) {
   });
 });
 router.post('/', function(req, res, next) {
-  console.log(req);
-  var newUser = new Parse.User();
-
-  newUser.set("username", req.body.email);
-  newUser.set("password", req.body.password);
-  newUser.set("email", req.body.email);
-  newUser.set("phone", req.body.phone);
-  newUser.set("firstname", req.body.firstname);
-  newUser.set("lastname", req.body.lastname);
-  newUser.set("gender", req.body.gender);
-  newUser.set("dateOfBirth", {__type: "Date", iso: req.body.dob});
-
-  newUser.signUp(null, {
-    success: function (user) {
-      addDoctor(user, req.body, {
-        success: function (doctor) {
-          console.log("Dcotor " + doctor.id + " saved");
-          user.set("doctorPointer", doctor);
-          user.save(null, {
-            success: function() {},
-            error: function(error) {console.log(error);}
-          });
-          Parse.User.logIn(req.body.email, req.body.password, {
-            success: function(user) {
-              console.log(user);
-              res.status(201).json({"code": 1, "sessionToken": user.attributes.sessionToken});
-            },
-            error: function(user, error) {
-              res.status(400)
-                .json({"code": error.code, "message": error.message});
-            }
-          })
-
-        },
-        error: function (error) {
-          res.status(400)
-            .json({"code": error.code, "message": error.message});
-        }
-      });
+  signUpUser(req.body, "Doctor", {
+    success: function success (user) {
+      console.log(user.attributes.sessionToken);
+      res.status(201).json({"code": 1, "sessionToken": user.attributes.sessionToken});
     },
-    error: function (user, error) {
+    error: function error (error) {
       res.status(400)
-        .json({"code": error.code, "message": error.message});
+          .json({"code": error.code, "message": error.message});
     }
-  })
+  });
 });
 
 router.get('/patients', function(req, res, next) {

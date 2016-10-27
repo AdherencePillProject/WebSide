@@ -5,8 +5,7 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
   var sessionToken = req.get("x-parse-session-token");
   Parse.User.become(sessionToken, {
-    success: function() {
-      var user = Parse.User.current();
+    success: function(user) {
       console.log(user);
       if (user) {
         var type = 0;
@@ -16,6 +15,7 @@ router.get('/', function(req, res, next) {
         if (user.get("doctorPointer") !== undefined) {
           type += 10;
         }
+        console.log(type);
         res.status(200).json({
           code: 1,
           email: user.get("email"),

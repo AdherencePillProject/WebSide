@@ -13,11 +13,6 @@ router.get('/', function(req, res, next) {
       var users = Parse.Object.extend("_User");
       var user = new users();
       var Query = new Parse.Query(doctors);
-      Query.select("hospitalName", "hospitalAddress", "hospitalCity",
-        "user.firstname", "user.lastname", "user.email");
-      Query.exists("hospitalName");
-      Query.include("user");
-      Query.notEqualTo("hospitalName", "");
       Query.find({
         success: function(results) {
           results.forEach(function(doctor) {

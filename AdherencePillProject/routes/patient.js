@@ -3,12 +3,34 @@ var router = express.Router();
 var utility = require('./utility');
 var signUpUser = utility.signUpUser;
 var addPatientDoctorRelation = utility.addPatientDoctorRelation;
-/* GET users listing. */
-// router.get('/', function(req, res, next) {
-//   var user = new Parse.User();
-//
-//   res.json(user);
-// });
+
+/* GET get the information of the patient */
+router.get('/', function(req, res, next) {
+  var sessionToken = req.get("x-parse-session-token");
+  Parse.User.become(sessionToken, {
+    success: function success(user) {
+      if (user) {
+        var ret = {
+          firstname: user.get("firstname"),
+          gender: user.get("gender"),
+          email: user.get("email"),
+          phone: user.get("phone")
+        };
+        res.status(200)
+            .json({code: 1, info: ret});
+      } else {
+        res.status(401)
+            .json({code: 401, message: ""});
+      }
+    },
+    error: function error(error) {
+      res.status(401)
+          .json({code: error.code, message: error.message});
+    }
+  });
+});
+
+/* POST sign up a new patient */
 router.post('/', function(req, res, next) {
   signUpUser(req.body, "Patient", {
     success: function success (user) {

@@ -59,6 +59,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/user', user);
 app.use('/login', login);
+app.use('/logout', logout);
 app.use('/patient', patient);
 app.use('/doctor', doctor);
 app.use('/pharmacy', pharmacy);

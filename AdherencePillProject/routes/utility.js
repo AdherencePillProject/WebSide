@@ -72,8 +72,25 @@ exports.signUpUser = function(userInfo, type, callback) {
     }
   })
 }
-
-
+//
+//exports.getUserProfile = function(userInfo, type, callback) {
+//  Parse.User.become(userInfo, {
+//    success: function(user) {
+//      console.log(user);
+//      if (user) {
+//        if (type === "Doctor") {
+//          user.
+//        }
+//        return callback.success(user);
+//      } else {
+//        return callback.error({code: 209, message: "Invalid Session Token"});
+//      }
+//    },
+//    error: function(error) {
+//      return callback.error({code: error.code, message: error.message});
+//    }
+//  });
+//}
 
 exports.addPatientDoctorRelation = function(patient, doctor, callback) {
   var query = new Parse.Query(Parse.Object.extend("PatientDoctor"));

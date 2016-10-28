@@ -6,7 +6,6 @@ router.get('/', function(req, res, next) {
   var sessionToken = req.get("x-parse-session-token");
   Parse.User.become(sessionToken, {
     success: function(user) {
-      console.log(user);
       if (user) {
         var type = 0;
         if (user.get("patientPointer") !== undefined) {

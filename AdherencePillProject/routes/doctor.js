@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var utility = require('./utility');
 var signUpUser = utility.signUpUser;
+var getUserProfile = utility.getUserProfile;
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -35,6 +36,20 @@ router.get('/', function(req, res, next) {
     }
   });
 });
+
+/* GET user profile */
+router.get('/profile', function(req, res, next) {
+  var sessionToken = req.get("x-parse-session-token");
+  getUserProfile(sessionToken, "Doctor", {
+    success: function success(user) {
+      res.status(200).json({user: user});
+    },
+    error: function error(error) {
+      res.status(401).json({"code": error.code, "message": error.message});
+    }
+  });
+});
+
 router.post('/', function(req, res, next) {
   signUpUser(req.body, "Doctor", {
     success: function success (user) {

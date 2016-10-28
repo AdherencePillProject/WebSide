@@ -4,18 +4,22 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
     // TODO Check header
     var sessionToken = req.get("x-parse-session-token");
-    console.log(sessionToken);
     if (sessionToken) {
         Parse.User.become(sessionToken).then(function(user) {
-            user.logOut();
-            res.json({success: "success"});
+            Parse.User.logOut().then(function () {
+                console.log('success');
+                res.json({code: 1, success: "success"});
+            }, function(error) {
+                console.log('error');
+                res.status(401).json({code: error.code, message: error.message});
+            });
         }, function(error) {
             res.status(401)
                 .json({code: error.code, message: error.message});
         });
     } else {
         res.status(401)
-            .json({error: "Error"});
+            .json({code: 209, error: "Error"});
     }
 });
 

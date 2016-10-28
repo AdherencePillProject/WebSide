@@ -50,6 +50,62 @@ router.get('/profile', function(req, res, next) {
   });
 });
 
+/* POST get the prescription bottle information of a specific patient */
+router.post('/patientPrescription', function(req, res, next) {
+  var sessionToken = req.get("x-parse-session-token");
+  Parse.User.become(sessionToken, {
+    success: function success(user) {
+      var doctorId = user.get('objectId');
+      var patientId = req.body.patientId;
+      var relation = Parse.Object.extend("PatientDoctor");
+      var queryDoctor = Parse.Query(relation);
+      var queryPatient = Parse.Query(relation);
+      queryDoctor.equalTo("doctor", doctorId);
+      queryPatient.equalTo("patient", patientId);
+      var compoundQuery = Parse.Query.and(queryDoctor, queryPatient);
+      compoundQuery.find({
+        success: function success(entry) {
+          if (entry) {
+            var bottle = Parse.Object.extend("Bottle");
+            var query = Parse.Query(bottle);
+            query.include("owner");
+            query.include("owner.user");
+            query.equalTo("owner", patientId);
+            query.find({
+              success: function success(bottles) {
+                var ret = new Array();
+                for (var b in bottles) {
+                  ret.push({
+                    owner: b.get("owner").get("userAccount").get("firstname"),
+                    bottleName: b.get("NAME"),
+                    time: b.get("TIME"),
+                    battery: b.get("batteryCharge"),
+                    weight: b.get("weight")
+                  })
+                }
+                res.status(200)
+                    .json(ret);
+              },
+              error: function error(error) {
+                res.status(401)
+                    .json({code: error.code, message: error.message});
+              }
+            })
+          }
+        },
+        error: function error(error) {
+          res.status(401)
+              .json({code: error.code, message: error.message});
+        }
+      });
+    },
+    error: function error(error) {
+      res.status(400)
+          .json({code: error.code, message: error.message});
+    }
+  });
+});
+
 router.post('/', function(req, res, next) {
   signUpUser(req.body, "Doctor", {
     success: function success (user) {

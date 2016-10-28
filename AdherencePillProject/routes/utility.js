@@ -1,13 +1,13 @@
 var exports = module.exports = {};
+//var mail = require('../common/mail');
 
 //Add an object according to the type (Patient or Doctor)
 function addPerson (userInfo, type, callback) {
   console.log("add Person");
   var Person = new Parse.Object.extend(type);
   var newPerson = new Person();
-  newPerson.set("user", userInfo.user);
+  newPerson.set("userAccount", userInfo.user);
   if (type === "Doctor") {
-    newPerson.set("user", userInfo.user);
     newPerson.set("hospitalName", userInfo.addtionInfo.hospitalName);
     newPerson.set("hospitalAddress", userInfo.addtionInfo.hospitalAddress);
     newPerson.set("hospitalCity", userInfo.addtionInfo.hospitalCity);
@@ -48,7 +48,9 @@ exports.signUpUser = function(userInfo, type, callback) {
           console.log(pointer);
           user.set(pointer, person);
           user.save(null, {
-            success: function() {},
+            success: function() {
+
+            },
             error: function(error) {console.log(error);}
           });
           Parse.User.logIn(userInfo.email, userInfo.password, {

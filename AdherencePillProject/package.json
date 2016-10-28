@@ -12,10 +12,15 @@
     "dotenv": "^2.0.0",
     "ejs": "~2.4.1",
     "express": "~4.13.4",
+    "fs": "0.0.1-security",
+    "handlebars": "^4.0.5",
     "mongoose": "^4.6.1",
     "morgan": "~1.7.0",
+    "nodemailer": "^2.6.4",
+    "nodemailer-smtp-transport": "^2.7.2",
     "parse": "~1.8.0",
     "parse-server": "*",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "utility": "^1.8.0"
   }
 }

@@ -1,5 +1,6 @@
 var exports = module.exports = {};
-//var mail = require('../common/mail');
+var utility = require('utility');
+var mail = require('../common/mail');
 
 //Add an object according to the type (Patient or Doctor)
 function addPerson (userInfo, type, callback) {
@@ -49,19 +50,28 @@ exports.signUpUser = function(userInfo, type, callback) {
           user.set(pointer, person);
           user.save(null, {
             success: function() {
-
+              var email = user.get('email');
+              var firstname = user.get('firstname');
+              var token = utility.md5(email + firstname + "test");
+              mail.activateEmail(email, token, firstname, {
+                success: function success () {
+                  console.log("Email Sent!");
+                },
+                error: function error() {
+                  console.log("Email not Sent");
+                }
+              });
+              Parse.User.logIn(userInfo.email, userInfo.password, {
+                success: function(user) {
+                  callback.success(user);
+                },
+                error: function(user, error) {
+                  callback.error(error);
+                }
+              });
             },
             error: function(error) {console.log(error);}
           });
-          Parse.User.logIn(userInfo.email, userInfo.password, {
-            success: function(user) {
-              callback.success(user);
-            },
-            error: function(user, error) {
-              callback.error(error);
-            }
-          })
-
         },
         error: function (error) {
           callback.error(error);

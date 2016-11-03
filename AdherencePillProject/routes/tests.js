@@ -7,6 +7,12 @@ var mail = require('../common/mail');
 router.get('/', function(req, res, next) {
   res.sendFile(path.join(__dirname, '../public/test.html'));
 });
-
-//mail.activateEmail("yichengwang2015@u.northwestern.edu", "SHvsMK", "SHvsMK", '../views/activateAccount.ejs');
+//mail.activateEmail("yichengwang2015@u.northwestern.edu", "SHvsMK", "SHvsMK", {
+//  success: function success() {
+//    console.log("yes");
+//  },
+//  error: function error() {
+//    console.log("no");
+//  }
+//});
 module.exports = router;

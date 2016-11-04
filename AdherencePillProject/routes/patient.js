@@ -156,4 +156,38 @@ router.get('/appointment', function(req, res, next) {
   })
 });
 
+/* Get precriptions of a patient */
+router.get('/prescription', function(req, res) {
+  var sessionToken = req.get('x-parse-session-token');
+  //var sessionToken = "r:772be34e72c42b75a0244a921bbe7925";
+  Parse.User.become(sessionToken, {
+    success: function success(user) {
+
+      var Patient = new Parse.Object.extend("Patient");
+      var patient = new Patient();
+      patient.id = user.get("patientPointer").id;
+      patient.id = "";
+
+      var Prescription = new Parse.Object.extend("Prescription");
+      var query = new Parse.Query(Prescription);
+      query.equalTo("patientID", patient);
+      query.include("schedule");
+      query.find({
+        success: function success(prescritions) {
+          res.status(200)
+              .json({code: 1, data: prescritions});
+        },
+        error: function error(error) {
+          res.status(401)
+              .json({code: error.code, message: error.message});
+        }
+      });
+    },
+    error: function error(error) {
+      res.status(401)
+          .json({code: error.code, message: error.message});
+    }
+  });
+});
+
 module.exports = router;

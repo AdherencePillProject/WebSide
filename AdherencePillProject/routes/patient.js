@@ -159,14 +159,12 @@ router.get('/appointment', function(req, res, next) {
 /* Get precriptions of a patient */
 router.get('/prescription', function(req, res) {
   var sessionToken = req.get('x-parse-session-token');
-  //var sessionToken = "r:772be34e72c42b75a0244a921bbe7925";
   Parse.User.become(sessionToken, {
     success: function success(user) {
 
       var Patient = new Parse.Object.extend("Patient");
       var patient = new Patient();
       patient.id = user.get("patientPointer").id;
-      patient.id = "";
 
       var Prescription = new Parse.Object.extend("Prescription");
       var query = new Parse.Query(Prescription);

@@ -82,7 +82,8 @@ exports.signUpUser = function(userInfo, type, callback) {
     error: function (user, error) {
       callback.error(error);
     }
-  })
+  });
+
 }
 //
 //exports.getUserProfile = function(userInfo, type, callback) {

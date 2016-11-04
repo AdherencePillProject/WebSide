@@ -26,7 +26,6 @@ router.get('/email', function(req, res, next) {
 /* Get the email of resetting the password of an account */
 router.get('/password', function(req, res) {
     var email = req.body.email;
-    var email = "yichengwang2015@u.northwestern.edu";
     Parse.Cloud.run('requirePasswordResetting', {email: email}, {
         success: function success(message) {
             console.log(message);

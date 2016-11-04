@@ -4,32 +4,42 @@ var utility = require('./utility');
 var signUpUser = utility.signUpUser;
 var getUserProfile = utility.getUserProfile;
 
-/* GET users listing. */
+/* GET doctor lists. */
 router.get('/', function(req, res, next) {
   var sessionToken = req.get("x-parse-session-token");
+  //sessionToken = "r:6df887928c5246c46b3641df518e09e2";
   Parse.User.become(sessionToken, {
-    success: function() {
-      var doctors = Parse.Object.extend("Doctor");
-      var users = Parse.Object.extend("_User");
-      var user = new users();
-      var Query = new Parse.Query(doctors);
-      Query.find({
-        success: function(results) {
-          results.forEach(function(doctor) {
-            console.log(doctor.get("user"));
-          });
-          res.status(200).json(results);
+    success: function(user) {
+      var query = new Parse.Query(Parse.User);
+      query.include("doctorPointer");
+      query.exists("doctorPointer");
+      query.find({
+        success: function success(doctors) {
+          var ret = new Array();
+          for (var i=0; i< doctors.length; i++) {
+            ret.push({
+              user: {
+                firstname:doctors[i].get("firstname"),
+                lastname: doctors[i].get("lastname"),
+              },
+              objectId: doctors[i].get("doctorPointer").id,
+              hospitalName: doctors[i].get("doctorPointer").get("hospitalName")
+            });
+          }
+          res.status(200)
+              .json(ret);
         },
-        error: function(error) {
-          res.status(200).json({});
+        error: function error(error) {
+          res.status(401)
+              .json({code: error.code, message: error.message});
         }
-      });
+      })
     },
-    error: function(error) {
+    error: function error(error) {
       res.status(401)
-        .json({"code": error.code, "message": error.message});
+          .json({code: error.code, message: error.message});
     }
-  });
+  })
 });
 
 /* GET user profile */
@@ -45,48 +55,34 @@ router.get('/profile', function(req, res, next) {
   });
 });
 
-/* POST get the prescription bottle information of a specific patient */
-router.post('/patientPrescription', function(req, res, next) {
+/* POST get the prescription bottle information of all patients of this doctor */
+router.get('/patientsPrescriptions', function(req, res) {
   var sessionToken = req.get("x-parse-session-token");
   Parse.User.become(sessionToken, {
     success: function success(user) {
-      var doctorId = user.get('objectId');
-      var patientId = req.body.patientId;
-      var relation = Parse.Object.extend("PatientDoctor");
-      var queryDoctor = Parse.Query(relation);
-      var queryPatient = Parse.Query(relation);
-      queryDoctor.equalTo("doctor", doctorId);
-      queryPatient.equalTo("patient", patientId);
-      var compoundQuery = Parse.Query.and(queryDoctor, queryPatient);
-      compoundQuery.find({
-        success: function success(entry) {
-          if (entry) {
-            var bottle = Parse.Object.extend("Bottle");
-            var query = Parse.Query(bottle);
-            query.include("owner");
-            query.include("owner.user");
-            query.equalTo("owner", patientId);
-            query.find({
-              success: function success(bottles) {
-                var ret = new Array();
-                for (var b in bottles) {
-                  ret.push({
-                    owner: b.get("owner").get("userAccount").get("firstname"),
-                    bottleName: b.get("NAME"),
-                    time: b.get("TIME"),
-                    battery: b.get("batteryCharge"),
-                    weight: b.get("weight")
-                  })
-                }
-                res.status(200)
-                    .json(ret);
-              },
-              error: function error(error) {
-                res.status(401)
-                    .json({code: error.code, message: error.message});
-              }
-            })
-          }
+      var Doctor = new Parse.Object.extend("Doctor");
+      var doctor = new Doctor();
+      doctor.id = user.get("doctorPointer").id;
+      console.log(user.get("doctorPointer").id);
+
+      var Appointment = new Parse.Object.extend("Appointment");
+      var query = new Parse.Query(Appointment);
+      query.equalTo("doctor", doctor);
+      query.find({
+        success: function success(patients) {
+          var Bottle = new Parse.Object.extend("Bottle");
+          var newQuery = new Parse.Query(Bottle);
+          newQuery.equalTo("owner", patients);
+          newQuery.find({
+            success: function success(prescriptions) {
+              res.status(200)
+                  .json({code: 1, data: prescriptions});
+            },
+            error: function error(error) {
+              res.status(401)
+                  .json({code: error.code, message: error.message});
+            }
+          });
         },
         error: function error(error) {
           res.status(401)
@@ -95,8 +91,8 @@ router.post('/patientPrescription', function(req, res, next) {
       });
     },
     error: function error(error) {
-      res.status(400)
-          .json({code: error.code, message: error.message});
+      res.status(401)
+          .json({code: error.code, message: error.messsage});
     }
   });
 });
@@ -163,7 +159,6 @@ router.get('/patients', function(req, res, next) {
               }
             })
           }
-
         },
         error: function(error) {
           res.status(400).json(error);

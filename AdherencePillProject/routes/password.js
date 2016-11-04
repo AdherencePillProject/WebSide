@@ -6,7 +6,6 @@ var mail = require('../common/mail');
 /* GET home page. */
 router.post('/forget', function(req, res, next) {
     var email = req.body.email;
-
     var query = new Parse.Query(Parse.User);
     query.equalTo("email", email);
     query.find({

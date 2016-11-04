@@ -78,7 +78,7 @@ exports.forgetPassword = function(email, token, firstname, callback) {
         email: email,
         firstname: firstname,
         templateFile: '../views/resetPassword.ejs',
-        type:"/reset_password"
+        type:"/account/newPassword"
     }
     sendEmail(data, info, {
         success: function success() {

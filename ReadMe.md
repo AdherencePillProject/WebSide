@@ -4,3 +4,10 @@ structure is to use REST API to complete the connection between front end and ba
 the whole project in the future, use Nginx to do the load balance and Docker to deploy the web application. But for now,
 our main purpose is the complete all the basic function of the web application. We will finish the structure as soon as
 possible so that all of the contributors can work on this repository.
+
+
+＃AdherencePill Project Backend Implementation
+
+'''
+
+'''

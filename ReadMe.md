@@ -1,13 +1,9 @@
-This repository is the new structure of the web side development. The new structure is based on the MVC structure. We
-use the Angularjs as the front end framework and nodejs express as the back end framework. The main purpose of this new
-structure is to use REST API to complete the connection between front end and back end. We plan to use the PM2 to manage
-the whole project in the future, use Nginx to do the load balance and Docker to deploy the web application. But for now,
-our main purpose is the complete all the basic function of the web application. We will finish the structure as soon as
-possible so that all of the contributors can work on this repository.
+#AdherencePill Project Backend Implementation
+In the back-end side, we mainly supply the RESTful API for the front-end side and provide the data to them so that in the front-end, people can only focus on the [page word](https://github.com/AdherencePillProject/web_cloud). No need to think about how to retrieve data and how to communicate with database.
 
+Here, we will give introduce two important things for both the front-end and back-end people to have a better communication with each other.
 
-＃AdherencePill Project Backend Implementation
-
+1.Structure of the Database
 ```
 Test
 ```

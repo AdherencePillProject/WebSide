@@ -5,6 +5,7 @@ Here, we will give introduce two important things for both the front-end and bac
 
 ##Structure of the Database
 > ####**There are 6 important tables:**
+
 ```
 1. User
 2. Patient

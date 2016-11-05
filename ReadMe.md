@@ -14,4 +14,23 @@ Here, we will give introduce two important things for both the front-end and bac
 5. Prescription
 6. Schedule
 ```
+
+>####**User**
+This table is the most important table for the user management which is the build-in class of the Parse Server and it contains these fields:
+
+```
+```
+
+>####**User**
+
+>####**User**
+
+>####**User**
+
+
+>####**User**
+
+
+>####**User**
+
 ##RESTful API

@@ -159,59 +159,100 @@ router.post('/appointment', function(req, res) {
 //  })
 //});
 
-router.get('/appointment', function(req, res, next) {
+/* retrieve the appintments of a patient */
+router.get('/appointment', function(req, res) {
   var sessionToken = req.get("x-parse-session-token");
+  sessionToken = "r:747c064fa2aeeba9cb19bfd541199cfa";
   Parse.User.become(sessionToken, {
-    success: function() {
-      var user = Parse.User.current();
-      var patient = Parse.Object.extend("Patient");
-      var users = Parse.Object.extend("_User");
-      var _user = new users();
-      _user.id = user.id;
-      var query = new Parse.Query(patient);
-      query.include("user");
-      query.equalTo("user", _user);
-      query.first({
-        success: function(patient) {
-          var appointment = Parse.Object.extend("Appointment");
-          var query = new Parse.Query(appointment);
-          query.select("time", "doctor.user.firstname", "doctor.user.lastname",
-            "doctor.hospitalName", "doctor.hospitalAddress", "doctor.hospitalCity");
-          query.include("doctor");
-          query.include("doctor.user");
-          query.ascending("time");
-          query.equalTo("patient", patient);
-          query.find({
-            success: function(results) {
-              var ret = new Array();
-              for (var i=0; i<results.length; i++) {
-                ret.push({
-                  doctorFirstName: results[i].get("doctor").get("user").get("firstname"),
-                  doctorLastName: results[i].get("doctor").get("user").get("lastname"),
-                  hospitalName: results[i].get("doctor").get("hospitalName"),
-                  hospitalCity: results[i].get("doctor").get("hospitalCity"),
-                  hospitalAddress: results[i].get("doctor").get("hospitalAddress"),
-                  date: results[i].get("time")
-                });
-              }
-              res.status(200).json(ret);
-            },
-            error: function(error) {
-              res.status(200).json([]);
-            }
-          })
+    success: function success(user) {
+      console.log("in");
+      var patient = user.get("patientPointer");
+      var Appointment = new Parse.Object.extend("Appointment");
+      var query = new Parse.Query(Appointment);
+      query.equalTo("patient", patient);
+      query.include("doctor");
+      query.include("doctor.userAccount");
+      query.ascending("time");
+      query.find({
+        success: function success(appointments) {
+          var ret = new Array();
+          for (var i = 0; i < appointments.length; i++) {
+            ret.push({
+              doctorFirstName: appointments[i].get("doctor").get("userAccount").get("firstname"),
+              doctorLastName: appointments[i].get("doctor").get("userAccount").get("lastname"),
+              hospitalName: appointments[i].get("doctor").get("hospitalName"),
+              hospitalCity: appointments[i].get("doctor").get("hospitalCity"),
+              hospitalAddress: appointments[i].get("doctor").get("hospitalAddress"),
+              date: appointments[i].get("time")
+            });
+          }
+          res.json(ret);
         },
         error: function(patient, error) {
           res.status(400).json(error);
         }
       });
     },
-    error: function(error) {
+    error: function error(error) {
       res.status(401)
-        .json({"code": error.code, "message": error.message});
+          .json({"code": error.code, "message": error.message});
     }
   })
 });
+
+//router.get('/appointment', function(req, res, next) {
+//  var sessionToken = req.get("x-parse-session-token");
+//  Parse.User.become(sessionToken, {
+//    success: function() {
+//      var user = Parse.User.current();
+//      var patient = Parse.Object.extend("Patient");
+//      var users = Parse.Object.extend("_User");
+//      var _user = new users();
+//      _user.id = user.id;
+//      var query = new Parse.Query(patient);
+//      query.include("user");
+//      query.equalTo("user", _user);
+//      query.first({
+//        success: function(patient) {
+//          var appointment = Parse.Object.extend("Appointment");
+//          var query = new Parse.Query(appointment);
+//          query.select("time", "doctor.user.firstname", "doctor.user.lastname",
+//            "doctor.hospitalName", "doctor.hospitalAddress", "doctor.hospitalCity");
+//          query.include("doctor");
+//          query.include("doctor.user");
+//          query.ascending("time");
+//          query.equalTo("patient", patient);
+//          query.find({
+//            success: function(results) {
+//              var ret = new Array();
+//              for (var i=0; i<results.length; i++) {
+//                ret.push({
+//                  doctorFirstName: results[i].get("doctor").get("user").get("firstname"),
+//                  doctorLastName: results[i].get("doctor").get("user").get("lastname"),
+//                  hospitalName: results[i].get("doctor").get("hospitalName"),
+//                  hospitalCity: results[i].get("doctor").get("hospitalCity"),
+//                  hospitalAddress: results[i].get("doctor").get("hospitalAddress"),
+//                  date: results[i].get("time")
+//                });
+//              }
+//              res.status(200).json(ret);
+//            },
+//            error: function(error) {
+//              res.status(200).json([]);
+//            }
+//          })
+//        },
+//        error: function(patient, error) {
+//          res.status(400).json(error);
+//        }
+//      });
+//    },
+//    error: function(error) {
+//      res.status(401)
+//        .json({"code": error.code, "message": error.message});
+//    }
+//  })
+//});
 
 /* Get precriptions of a patient */
 router.get('/prescription', function(req, res) {

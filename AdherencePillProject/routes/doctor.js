@@ -20,7 +20,7 @@ router.get('/', function(req, res, next) {
       Query.find({
         success: function(results) {
           results.forEach(function(doctor) {
-            console.log(doctor.get("user"));
+            // user: doctor;
           });
           res.status(200).json(results);
         },

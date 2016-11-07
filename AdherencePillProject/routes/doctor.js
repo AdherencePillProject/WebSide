@@ -1,113 +1,86 @@
 var express = require('express');
 var router = express.Router();
 var utility = require('./utility');
-var signUpUser = utility.signUpUser;
-var getUserProfile = utility.getUserProfile;
+var addDoctor = utility.addDoctor;
 
-/* GET doctor lists. */
+/* GET users listing. */
 router.get('/', function(req, res, next) {
   var sessionToken = req.get("x-parse-session-token");
-  //sessionToken = "r:6df887928c5246c46b3641df518e09e2";
   Parse.User.become(sessionToken, {
-    success: function(user) {
-      var query = new Parse.Query(Parse.User);
-      query.include("doctorPointer");
-      query.exists("doctorPointer");
-      query.find({
-        success: function success(doctors) {
-          var ret = new Array();
-          for (var i=0; i< doctors.length; i++) {
-            ret.push({
-              user: {
-                firstname:doctors[i].get("firstname"),
-                lastname: doctors[i].get("lastname"),
-              },
-              objectId: doctors[i].get("doctorPointer").id,
-              hospitalName: doctors[i].get("doctorPointer").get("hospitalName")
-            });
-          }
-          res.status(200)
-              .json(ret);
-        },
-        error: function error(error) {
-          res.status(401)
-              .json({code: error.code, message: error.message});
-        }
-      })
-    },
-    error: function error(error) {
-      res.status(401)
-          .json({code: error.code, message: error.message});
-    }
-  })
-});
-
-/* GET user profile */
-router.get('/profile', function(req, res, next) {
-  var sessionToken = req.get("x-parse-session-token");
-  getUserProfile(sessionToken, "Doctor", {
-    success: function success(user) {
-      res.status(200).json({user: user});
-    },
-    error: function error(error) {
-      res.status(401).json({"code": error.code, "message": error.message});
-    }
-  });
-});
-
-/* POST get the prescription bottle information of all patients of this doctor */
-router.get('/patientsPrescriptions', function(req, res) {
-  var sessionToken = req.get("x-parse-session-token");
-  Parse.User.become(sessionToken, {
-    success: function success(user) {
-      var Doctor = new Parse.Object.extend("Doctor");
-      var doctor = new Doctor();
-      doctor.id = user.get("doctorPointer").id;
-      console.log(user.get("doctorPointer").id);
-
-      var Appointment = new Parse.Object.extend("Appointment");
-      var query = new Parse.Query(Appointment);
-      query.equalTo("doctor", doctor);
-      query.find({
-        success: function success(patients) {
-          var Bottle = new Parse.Object.extend("Bottle");
-          var newQuery = new Parse.Query(Bottle);
-          newQuery.equalTo("owner", patients);
-          newQuery.find({
-            success: function success(prescriptions) {
-              res.status(200)
-                  .json({code: 1, data: prescriptions});
-            },
-            error: function error(error) {
-              res.status(401)
-                  .json({code: error.code, message: error.message});
-            }
+    success: function() {
+      var doctors = Parse.Object.extend("Doctor");
+      var users = Parse.Object.extend("_User");
+      var user = new users();
+      var Query = new Parse.Query(doctors);
+      Query.select("hospitalName", "hospitalAddress", "hospitalCity",
+        "user.firstname", "user.lastname", "user.email");
+      Query.exists("hospitalName");
+      Query.include("user");
+      Query.notEqualTo("hospitalName", "");
+      Query.find({
+        success: function(results) {
+          results.forEach(function(doctor) {
+            console.log(doctor.get("user"));
           });
+          res.status(200).json(results);
         },
-        error: function error(error) {
-          res.status(401)
-              .json({code: error.code, message: error.message});
+        error: function(error) {
+          res.status(200).json({});
         }
       });
     },
-    error: function error(error) {
+    error: function(error) {
       res.status(401)
-          .json({code: error.code, message: error.messsage});
+        .json({"code": error.code, "message": error.message});
     }
   });
 });
-
 router.post('/', function(req, res, next) {
-  signUpUser(req.body, "Doctor", {
-    success: function success (user) {
-      var sessionToken = user.getSessionToken();
-      res.status(201).json({"code": 1, "sessionToken": sessionToken});
+  console.log(req);
+  var newUser = new Parse.User();
+
+  newUser.set("username", req.body.email);
+  newUser.set("password", req.body.password);
+  newUser.set("email", req.body.email);
+  newUser.set("phone", req.body.phone);
+  newUser.set("firstname", req.body.firstname);
+  newUser.set("lastname", req.body.lastname);
+  newUser.set("gender", req.body.gender);
+  newUser.set("dateOfBirth", {__type: "Date", iso: req.body.dob});
+
+  newUser.signUp(null, {
+    success: function (user) {
+      addDoctor(user, req.body, {
+        success: function (doctor) {
+          console.log("Dcotor " + doctor.id + " saved");
+          user.set("doctorPointer", doctor);
+          user.save(null, {
+            success: function() {},
+            error: function(error) {console.log(error);}
+          });
+          Parse.User.logIn(req.body.email, req.body.password, {
+            success: function(user) {
+              console.log(user);
+              res.status(201).json({"code": 1, "sessionToken": user.attributes.sessionToken});
+            },
+            error: function(user, error) {
+              res.status(400)
+                .json({"code": error.code, "message": error.message});
+            }
+          })
+
+        },
+        error: function (error) {
+          res.status(400)
+            .json({"code": error.code, "message": error.message});
+        }
+      });
     },
-    error: function error (error) {
+    error: function (user, error) {
       res.status(400)
-          .json({"code": error.code, "message": error.message});
+        .json({"code": error.code, "message": error.message});
     }
-  });
+  })
 });
 
 router.get('/patients', function(req, res, next) {
@@ -143,12 +116,12 @@ router.get('/patients', function(req, res, next) {
                 var ret = new Array();
                 for (var i=0; i<results.length; i++) {
                   ret.push({
-                    patientFirstName: results[i].get("patient").get("user").get("firstname"),
-                    patientLastName: results[i].get("patient").get("user").get("lastname"),
-                    patientDateOfBirth: results[i].get("patient").get("user").get("dateOfBirth"),
-                    patientPhone: results[i].get("patient").get("user").get("phone"),
-                    patientEmail: results[i].get("patient").get("user").get("email"),
-                    patientGender: results[i].get("patient").get("user").get("gender"),
+                    firstName: results[i].get("patient").get("user").get("firstname"),
+                    lastName: results[i].get("patient").get("user").get("lastname"),
+                    dateOfBirth: results[i].get("patient").get("user").get("dateOfBirth"),
+                    phone: results[i].get("patient").get("user").get("phone"),
+                    email: results[i].get("patient").get("user").get("email"),
+                    gender: results[i].get("patient").get("user").get("gender"),
                     patientId: results[i].get("patient").id
                   });
                 }
@@ -159,6 +132,7 @@ router.get('/patients', function(req, res, next) {
               }
             })
           }
+
         },
         error: function(error) {
           res.status(400).json(error);
@@ -172,4 +146,188 @@ router.get('/patients', function(req, res, next) {
   });
 })
 
+router.post('/patient/prescription', function(req, res, next) {
+  console.log(req.body);
+  var sessionToken = req.get("x-parse-session-token");
+  if (sessionToken) {
+    Parse.User.become(sessionToken, {
+      success: function(user) {
+        var doctor = Parse.Object.extend("Doctor");
+        var users = Parse.Object.extend("_User");
+        var _user = new users();
+        _user.id = user.id;
+        var query = new Parse.Query(doctor);
+        query.include("user");
+        query.equalTo("user", _user);
+        query.first({
+          success: function(doctor) {
+            var patient = Parse.Object.extend("Patient");
+            var query = new Parse.Query(patient);
+            query.equalTo("objectId", req.body.patientId);
+            query.first({
+              success: function(patient) {
+                var Schedule = new Parse.Object.extend("Schedule");
+                var schedule = new Schedule();
+                schedule.set("times", req.body.times);
+                schedule.save(null, {
+                  success: function(schedule) {
+                    var Prescription = new Parse.Object.extend("Prescription");
+                    var prescription = new Prescription();
+                    prescription.set("name", req.body.name);
+                    prescription.set("schedule", schedule);
+                    prescription.set("note", req.body.note);
+                    prescription.set("doctor", doctor);
+                    prescription.set("patient", patient);
+                    prescription.save(null, {
+                      success: function(prescription) {
+                        res.status(201).json({code: 1});
+                      },
+                      error: function(error) {
+                        res.status(400).json(error);
+                      }
+                    })
+                  },
+                  error: function(error) {
+                    res.status(400).json(error);
+                  }
+                });
+              },
+              error: function(error) {
+                res.status(400).json(error);
+              }
+            })
+
+          },
+          error: function(error) {
+            res.status(400).json(error);
+          }
+        });
+      },
+      error: function(error) {
+        res.status(400).json(error);
+      }
+    });
+  }
+  else {
+    res.status(403).json({"code": 201, massage: "Invalid session"});
+  }
+
+
+})
+
+router.get('/patient/prescription', function(req, res, next) {
+  var sessionToken = req.get("x-parse-session-token");
+  if (sessionToken) {
+    Parse.User.become(sessionToken, {
+      success: function(user) {
+        var doctors = Parse.Object.extend("Doctor");
+        var users = Parse.Object.extend("_User");
+        var _user = new users();
+        _user.id = user.id;
+        var query = new Parse.Query(doctors);
+        query.include("user");
+        query.equalTo("user", _user);
+        query.first({
+          success: function(doctor) {
+            var patient = Parse.Object.extend("Patient");
+            var query = new Parse.Query(patient);
+            query.equalTo("objectId", req.query.patientId);
+            query.first({
+              success: function(patient) {
+                var Prescription = new Parse.Object.extend("Prescription");
+                var query = new Parse.Query(Prescription);
+                var doctors = Parse.Object.extend("Doctor");
+                var _doctor = new doctors();
+                _doctor.id = doctor.id;
+                var patients = Parse.Object.extend("Patient");
+                var _patient = new patients();
+                _patient.id = patient.id;
+                query.include("schedule");
+                query.equalTo("doctor", _doctor);
+                query.equalTo("patient", _patient);
+                query.find({
+                  success: function(results) {
+                    var ret = new Array();
+                    for (var i=0; i<results.length; i++) {
+                      ret.push({
+                        id: results[i].id,
+                        name: results[i].get("name"),
+                        note: results[i].get("note"),
+                        times: results[i].get("schedule").get("times")
+                      });
+                    }
+                    res.status(200).json(ret);
+                  },
+                  error: function(error) {
+                    res.status(400).json(error);
+                  }
+                })
+              },
+              error: function(error) {
+                res.status(400).json(error);
+              }
+            })
+
+          },
+          error: function(error) {
+            res.status(400).json(error);
+          }
+        });
+      },
+      error: function(error) {
+        res.status(400).json(error);
+      }
+    });
+  }
+  else {
+    res.status(403).json({code: 201, massage: "Invalid session"});
+  }
+})
+
+router.delete('/patient/prescription', function(req, res, next) {
+  var sessionToken = req.get("x-parse-session-token");
+  if (sessionToken) {
+    Parse.User.become(sessionToken, {
+      success: function(user) {
+        var doctors = Parse.Object.extend("Doctor");
+        var users = Parse.Object.extend("_User");
+        var _user = new users();
+        _user.id = user.id;
+        var query = new Parse.Query(doctors);
+        query.equalTo("user", _user);
+        query.first({
+          success: function(doctor) {
+            var Prescription = Parse.Object.extend("Prescription");
+            var query = new Parse.Query(Prescription);
+            query.equalTo("objectId", req.query.prescriptionId);
+            query.first({
+              success: function(result) {
+                result.destroy({
+                  success: function(result) {
+                    res.status(200).json({code: 1});
+                  },
+                  error: function(error) {
+                    res.status(400).json(error);
+                  }
+                });
+              },
+              error: function(error) {
+                res.status(400).json(error);
+              }
+            });
+          },
+          error: function(error) {
+            res.status(400).json(error);
+          }
+        });
+      },
+      error: function(error) {
+        res.status(400).json(error);
+      }
+    });
+  }
+  else {
+    res.status(403).json({code: 201, massage: "Invalid session"});
+  }
+})
 module.exports = router;

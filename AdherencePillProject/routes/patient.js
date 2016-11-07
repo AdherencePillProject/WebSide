@@ -47,7 +47,10 @@ router.post('/', function(req, res, next) {
 /* add an appointment for a patient with the doctor selected */
 router.post('/appointment', function(req, res) {
   var sessionToken = req.get("x-parse-session-token");
-  console.log(req.body);
+  if (!sessionToken) {
+    res.status(403).json({code: 201, massage: "Invalid session"});
+    return;
+  }
   Parse.User.become(sessionToken, {
     success: function(user) {
       var Doctor = new Parse.Object.extend("Doctor");
@@ -162,7 +165,6 @@ router.post('/appointment', function(req, res) {
 /* retrieve the appintments of a patient */
 router.get('/appointment', function(req, res) {
   var sessionToken = req.get("x-parse-session-token");
-  sessionToken = "r:747c064fa2aeeba9cb19bfd541199cfa";
   Parse.User.become(sessionToken, {
     success: function success(user) {
       console.log("in");

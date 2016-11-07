@@ -106,45 +106,6 @@ router.post('/appointment', function(req, res) {
 });
 
 /* retrieve the appintments of a patient */
-router.get('/appointment', function(req, res) {
-  var sessionToken = req.get("x-parse-session-token");
-  Parse.User.become(sessionToken, {
-    success: function success(user) {
-      console.log("in");
-      var patient = user.get("patientPointer");
-      var Appointment = new Parse.Object.extend("Appointment");
-      var query = new Parse.Query(Appointment);
-      query.equalTo("patient", patient);
-      query.include("doctor");
-      query.include("doctor.user");
-      query.ascending("time");
-      query.find({
-        success: function success(appointments) {
-          var ret = new Array();
-          for (var i = 0; i < appointments.length; i++) {
-            ret.push({
-              doctorFirstName: appointments[i].get("doctor").get("user").get("firstname"),
-              doctorLastName: appointments[i].get("doctor").get("user").get("lastname"),
-              hospitalName: appointments[i].get("doctor").get("hospitalName"),
-              hospitalCity: appointments[i].get("doctor").get("hospitalCity"),
-              hospitalAddress: appointments[i].get("doctor").get("hospitalAddress"),
-              date: appointments[i].get("time")
-            });
-          }
-          res.json(ret);
-        },
-        error: function(patient, error) {
-          res.status(400).json(error);
-        }
-      });
-    },
-    error: function error(error) {
-      res.status(401)
-          .json({"code": error.code, "message": error.message});
-    }
-  })
-});
-
 router.get('/appointment', function(req, res, next) {
   checkSession(req.get("x-parse-session-token"), {
     success: function(user) {

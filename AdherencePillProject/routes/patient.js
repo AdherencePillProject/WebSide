@@ -72,7 +72,7 @@ router.post('/appointment', function(req, res) {
                 appointment.set("time", time);
                 appointment.save(null, {
                   success: function(appointment) {
-                    res.status(200).json({code: 1});
+                    res.status(201).json({code: 1});
                   },
                   error: function(appointment, error) {
                     res.status(400).json(error);

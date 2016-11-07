@@ -153,34 +153,43 @@ router.get('/appointment', function(req, res, next) {
 
 /* Get precriptions of a patient */
 router.get('/prescription', function(req, res) {
-  var sessionToken = req.get('x-parse-session-token');
-  Parse.User.become(sessionToken, {
+  checkSession(req.get('x-parse-session-token'), {
     success: function success(user) {
-
-      var Patient = new Parse.Object.extend("Patient");
-      var patient = new Patient();
-      patient.id = user.get("patientPointer").id;
-
-      var Prescription = new Parse.Object.extend("Prescription");
-      var query = new Parse.Query(Prescription);
-      query.equalTo("patientID", patient);
-      query.include("schedule");
-      query.find({
-        success: function success(prescritions) {
-          res.status(200)
-              .json({code: 1, data: prescritions});
+      getPatientProfile(user.id, {
+        success: function(patient) {
+          var Prescription = new Parse.Object.extend("Prescription");
+          var query = new Parse.Query(Prescription);
+          query.equalTo("patient", patient);
+          query.include("schedule");
+          query.find({
+            success: function success(prescritions) {
+              var ret = new Array();
+              for (var i=0; i<prescritions.length; i++) {
+                ret.push({
+                  name: prescritions[i].get("name"),
+                  note: prescritions[i].get("note"),
+                  schedule: prescritions[i].get("schedule").get("times")
+                })
+              }
+              res.status(200).json(ret);
+            },
+            error: function error(error) {
+              res.status(400)
+                  .json({code: error.code, message: error.message});
+            }
+          });
         },
-        error: function error(error) {
-          res.status(401)
+        error: function(error) {
+          res.status(400)
               .json({code: error.code, message: error.message});
         }
-      });
+      });//getPatientProfile
     },
     error: function error(error) {
-      res.status(401)
+      res.status(409)
           .json({code: error.code, message: error.message});
     }
-  });
+  });//checkSession
 });
 
 module.exports = router;

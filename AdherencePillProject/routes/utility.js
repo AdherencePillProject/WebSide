@@ -2,12 +2,14 @@ var exports = module.exports = {};
 var utility = require('utility');
 var mail = require('../common/mail');
 
+
+
 //Add an object according to the type (Patient or Doctor)
 function addPerson (userInfo, type, callback) {
   console.log("add Person");
   var Person = new Parse.Object.extend(type);
   var newPerson = new Person();
-  newPerson.set("userAccount", userInfo.user);
+  newPerson.set("user", userInfo.user);
   if (type === "Doctor") {
     newPerson.set("hospitalName", userInfo.addtionInfo.hospitalName);
     newPerson.set("hospitalAddress", userInfo.addtionInfo.hospitalAddress);
@@ -18,6 +20,50 @@ function addPerson (userInfo, type, callback) {
       return callback.success(person);
     },
     error: function (person, error) {
+      return callback.error(error);
+    }
+  });
+}
+
+exports.checkSession = function(session, callback) {
+  if (!session) {
+    return callback.error({code: 201, massage: "Invalid session"})
+  }
+  else {
+    Parse.User.become(session, {
+      success: function(user) {
+        if (user) {
+          return callback.success(user);
+        }
+        else {
+          return callback.error({code: 201, massage: "Invalid session"})
+        }
+      },
+      error: function(error) {
+        return callback.error(error);
+      }
+    });
+  }
+}
+
+exports.getPatientProfile = function(userId, callback) {
+  var patient = Parse.Object.extend("Patient");
+  var users = Parse.Object.extend("_User");
+  var _user = new users();
+  _user.id = userId;
+  var query = new Parse.Query(patient);
+  query.include("user");
+  query.equalTo("user", _user);
+  query.first({
+    success: function(patient) {
+      if (patient) {
+        return callback.success(patient);
+      }
+      else {
+        return callback.error({code: -1, message: "Patient not found"});
+      }
+    },
+    error: function(error) {
       return callback.error(error);
     }
   });
@@ -45,9 +91,15 @@ exports.signUpUser = function(userInfo, type, callback) {
       addPerson({user: user, addtionInfo: userInfo}, type, {
         success: function (person) {
           console.log(type + " " + person.id + " saved");
-          var pointer = type.toLowerCase() + "Pointer";
-          console.log(pointer);
-          user.set(pointer, person);
+          // var pointer = type.toLowerCase() + "Pointer";
+          // console.log(pointer);
+          // user.set(pointer, person);
+          if (type.toLowerCase() === 'patient') {
+            user.set(type, 1);
+          }
+          else if (type.toLowerCase() === 'doctor') {
+            user.set(type, 10);
+          }
           user.save(null, {
             success: function() {
               var email = user.get('email');
@@ -133,4 +185,23 @@ exports.addPatientDoctorRelation = function(patient, doctor, callback) {
       return callback.error(error);
     }
   })
+}
+
+exports.findDoctor = function(doctorId, callback) {
+  var doctor = Parse.Object.extend("Doctor");
+  var query = new Parse.Query(doctor);
+  query.equalTo("objectId", doctorId);
+  query.first({
+    success: function(doctor) {
+      if (doctor) {
+        return callback.success(doctor);
+      }
+      else {
+        return callback.error({code:-1, message: "Doctor not found"});
+      }
+    },
+    error: function(error) {
+      return callback.error(error);
+    }
+  });
 }

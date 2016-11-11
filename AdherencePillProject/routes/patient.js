@@ -161,14 +161,56 @@ router.get('/prescription', function(req, res) {
           var query = new Parse.Query(Prescription);
           query.equalTo("patient", patient);
           query.include("schedule");
+          query.include("pill");
           query.find({
             success: function success(prescritions) {
               var ret = new Array();
               for (var i=0; i<prescritions.length; i++) {
                 ret.push({
                   name: prescritions[i].get("name"),
+                  pill: prescritions[i].get("pill"),
                   note: prescritions[i].get("note"),
                   schedule: prescritions[i].get("schedule").get("times")
+                })
+              }
+              res.status(200).json(ret);
+            },
+            error: function error(error) {
+              res.status(400)
+                  .json({code: error.code, message: error.message});
+            }
+          });
+        },
+        error: function(error) {
+          res.status(400)
+              .json({code: error.code, message: error.message});
+        }
+      });//getPatientProfile
+    },
+    error: function error(error) {
+      res.status(409)
+          .json({code: error.code, message: error.message});
+    }
+  });//checkSession
+});
+
+router.get('/pills', function(req, res) {
+  checkSession(req.get('x-parse-session-token'), {
+    success: function success(user) {
+      getPatientProfile(user.id, {
+        success: function(patient) {
+          var Prescription = new Parse.Object.extend("Prescription");
+          var query = new Parse.Query(Prescription);
+          query.equalTo("patient", patient);
+          query.include("pill");
+          query.find({
+            success: function success(prescritions) {
+              var ret = new Array();
+              for (var i=0; i<prescritions.length; i++) {
+                ret.push({
+                  pillName: prescritions[i].get("pill").get("pillName"),
+                  pillInfo: prescritions[i].get("pill").get("pillInfo"),
+                  pillInstruction: prescritions[i].get("pill").get("pillInstruction"),
                 })
               }
               res.status(200).json(ret);

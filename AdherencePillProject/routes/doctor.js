@@ -2,6 +2,10 @@ var express = require('express');
 var router = express.Router();
 var utility = require('./utility');
 var signUpUser = utility.signUpUser;
+var checkSession = utility.checkSession;
+var isDoctor = utility.isDoctor;
+var findPatient = utility.findPatient;
+var findPill = utility.findPill;
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -112,73 +116,61 @@ router.get('/patients', function(req, res, next) {
 })
 
 router.post('/patient/prescription', function(req, res, next) {
-  console.log(req.body);
-  var sessionToken = req.get("x-parse-session-token");
-  if (sessionToken) {
-    Parse.User.become(sessionToken, {
-      success: function(user) {
-        var doctor = Parse.Object.extend("Doctor");
-        var users = Parse.Object.extend("_User");
-        var _user = new users();
-        _user.id = user.id;
-        var query = new Parse.Query(doctor);
-        query.include("user");
-        query.equalTo("user", _user);
-        query.first({
-          success: function(doctor) {
-            var patient = Parse.Object.extend("Patient");
-            var query = new Parse.Query(patient);
-            query.equalTo("objectId", req.body.patientId);
-            query.first({
-              success: function(patient) {
-                var Schedule = new Parse.Object.extend("Schedule");
-                var schedule = new Schedule();
-                schedule.set("times", req.body.times);
-                schedule.save(null, {
-                  success: function(schedule) {
-                    var Prescription = new Parse.Object.extend("Prescription");
-                    var prescription = new Prescription();
-                    prescription.set("name", req.body.name);
-                    prescription.set("schedule", schedule);
-                    prescription.set("note", req.body.note);
-                    prescription.set("doctor", doctor);
-                    prescription.set("patient", patient);
-                    prescription.save(null, {
-                      success: function(prescription) {
-                        res.status(201).json({code: 1});
-                      },
-                      error: function(error) {
-                        res.status(400).json(error);
-                      }
-                    })
-                  },
-                  error: function(error) {
-                    res.status(400).json(error);
-                  }
-                });
-              },
-              error: function(error) {
-                res.status(400).json(error);
-              }
-            })
-
-          },
-          error: function(error) {
-            res.status(400).json(error);
-          }
-        });
-      },
-      error: function(error) {
-        res.status(400).json(error);
-      }
-    });
-  }
-  else {
-    res.status(403).json({"code": 201, massage: "Invalid session"});
-  }
-
-
-})
+  checkSession(req.get("x-parse-session-token"), {
+    success: function(user) {
+      isDoctor(user.id, {
+        success: function(doctor) {
+          findPatient(req.body.patientId, {
+            success: function(patient) {
+              findPill(req.body.pillId, {
+                success: function(pill) {
+                  var Schedule = new Parse.Object.extend("Schedule");
+                  var schedule = new Schedule();
+                  schedule.set("times", req.body.times);
+                  schedule.save(null, {
+                    success: function(schedule) {
+                      var Prescription = new Parse.Object.extend("Prescription");
+                      var prescription = new Prescription();
+                      prescription.set("name", req.body.name);
+                      prescription.set("schedule", schedule);
+                      prescription.set("note", req.body.note);
+                      prescription.set("doctor", doctor);
+                      prescription.set("patient", patient);
+                      prescription.set("pill", pill);
+                      prescription.save(null, {
+                        success: function(prescription) {
+                          res.status(201).json({code: 1});
+                        },
+                        error: function(error) {
+                          res.status(400).json(error);
+                        }
+                      })
+                    },
+                    error: function(error) {
+                      res.status(400).json(error);
+                    }
+                  }); //schedule.save
+                },
+                error: function(error) {
+                  res.status(400).json(error);
+                }
+              }); //findPill
+            },
+            error: function(error) {
+              res.status(400).json(error);
+            }
+          }); //findPatient
+        },
+        error: function(error) {
+          res.status(400).json(error);
+        }
+      }); //isDoctor
+    },
+    error: function(error) {
+      res.status(400).json(error);
+    }
+  }); //checkSession
+});
 
 router.get('/patient/prescription', function(req, res, next) {
   var sessionToken = req.get("x-parse-session-token");
@@ -208,6 +200,7 @@ router.get('/patient/prescription', function(req, res, next) {
                 var _patient = new patients();
                 _patient.id = patient.id;
                 query.include("schedule");
+                query.include("pill");
                 query.equalTo("doctor", _doctor);
                 query.equalTo("patient", _patient);
                 query.find({
@@ -217,6 +210,7 @@ router.get('/patient/prescription', function(req, res, next) {
                       ret.push({
                         id: results[i].id,
                         name: results[i].get("name"),
+                        pill: results[i].get("pill"),
                         note: results[i].get("note"),
                         times: results[i].get("schedule").get("times")
                       });

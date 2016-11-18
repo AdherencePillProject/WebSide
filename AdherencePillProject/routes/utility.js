@@ -69,6 +69,87 @@ exports.getPatientProfile = function(userId, callback) {
   });
 }
 
+exports.isDoctor = function(userId, callback) {
+  var Doctor = Parse.Object.extend("Doctor");
+  var User = Parse.Object.extend("_User");
+  var user = new User();
+  user.id = userId;
+  var query = new Parse.Query(Doctor);
+  query.include("user");
+  query.equalTo("user", user);
+  query.first({
+    success: function(doctor) {
+      if (doctor) {
+        return callback.success(doctor);
+      }
+      else {
+        return callback.error({code: -1, message: "Doctor not found"});
+      }
+    },
+    error: function(error) {
+      return callback.error(error);
+    }
+  });
+}
+
+exports.findPatient = function(patientId, callback) {
+  var Patient = Parse.Object.extend("Patient");
+  var query = new Parse.Query(Patient);
+  query.include("user");
+  query.equalTo("objectId", patientId);
+  query.first({
+    success: function(patient) {
+      if (patient) {
+        return callback.success(patient);
+      }
+      else {
+        return callback.error({code: -1, message: "Patient not found"});
+      }
+    },
+    error: function(error) {
+      return callback.error(error);
+    }
+  });
+}
+
+exports.findDoctor = function(doctorId, callback) {
+  var doctor = Parse.Object.extend("Doctor");
+  var query = new Parse.Query(doctor);
+  query.equalTo("objectId", doctorId);
+  query.first({
+    success: function(doctor) {
+      if (doctor) {
+        return callback.success(doctor);
+      }
+      else {
+        return callback.error({code:-1, message: "Doctor not found"});
+      }
+    },
+    error: function(error) {
+      return callback.error(error);
+    }
+  });
+}
+
+exports.findPill = function(pillId, callback) {
+  var Pill = Parse.Object.extend("PillLib");
+  var query = new Parse.Query(Pill);
+  query.equalTo("objectId", pillId);
+  query.first({
+    success: function(pill) {
+      if (pill) {
+        return callback.success(pill);
+      }
+      else {
+        return callback.error({code:-1, message: "Pill not found"});
+      }
+    },
+    error: function(error) {
+      return callback.error(error);
+    }
+  })
+}
+
 //Sign up a new user
 exports.signUpUser = function(userInfo, type, callback) {
   // TODO: Check body
@@ -185,23 +266,4 @@ exports.addPatientDoctorRelation = function(patient, doctor, callback) {
       return callback.error(error);
     }
   })
-}
-
-exports.findDoctor = function(doctorId, callback) {
-  var doctor = Parse.Object.extend("Doctor");
-  var query = new Parse.Query(doctor);
-  query.equalTo("objectId", doctorId);
-  query.first({
-    success: function(doctor) {
-      if (doctor) {
-        return callback.success(doctor);
-      }
-      else {
-        return callback.error({code:-1, message: "Doctor not found"});
-      }
-    },
-    error: function(error) {
-      return callback.error(error);
-    }
-  });
 }

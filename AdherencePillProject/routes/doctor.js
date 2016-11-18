@@ -289,4 +289,105 @@ router.delete('/patient/prescription', function(req, res, next) {
     res.status(403).json({code: 201, massage: "Invalid session"});
   }
 })
+
+router.get('/appointments', function(req, res, next) {
+  checkSession(req.get("x-parse-session-token"), {
+    success: function(user) {
+      isDoctor(user.id, {
+        success: function(doctor) {
+          var Appointment = new Parse.Object.extend("Appointment");
+          var query = new Parse.Query(Appointment);
+          query.equalTo("doctor", doctor);
+          query.include("patient");
+          query.include("patient.user");
+          query.ascending("time");
+          query.find({
+            success: function(results) {
+              console.log(results);
+              var ret = new Array();
+              for (var i=0; i<results.length; i++) {
+                ret.push({
+                  time: results[i].get("time"),
+                  patient: {
+                    id: results[i].get("patient").id,
+                    firstname: results[i].get("patient").get("user").get("firstname"),
+                    lastname: results[i].get("patient").get("user").get("lastname"),
+                    gender: results[i].get("patient").get("user").get("gender"),
+                    dateOfBirth: results[i].get("patient").get("user").get("dateOfBirth")
+                  }
+                });
+              }
+              res.status(200).json(ret);
+            },
+            error: function(error) {
+              res.status(400).json(error);
+            }
+          }); //query.find
+        },
+        error: function(error) {
+          res.status(400).json(error);
+        }
+      }); //isDoctor
+    },
+    error: function(error) {
+      res.status(400).json(error);
+    }
+  }); //checkSession
+});
+
+router.post('/appointment', function(req, res, next) {
+  checkSession(req.get("x-parse-session-token"), {
+    success: function(user) {
+      isDoctor(user.id, {
+        success: function(doctor) {
+          findPatient(req.body.patientId, {
+            success: function(patient) {
+              var Appointment = new Parse.Object.extend("Appointment");
+              var appointment = new Appointment();
+              var newQuery = new Parse.Query(Appointment);
+              var time = {__type: "Date", iso: req.body.date};
+              newQuery.equalTo("doctor", doctor);
+              newQuery.equalTo("patient", patient);
+              newQuery.equalTo("time", time);
+              newQuery.first({
+                success: function success(ret) {
+                  if (ret === undefined) {
+                    var appointment = new Parse.Object("Appointment");
+                    appointment.set("doctor", doctor);
+                    appointment.set("patient", patient);
+                    appointment.set("time", {__type: "Date", iso: req.body.date});
+                    appointment.save(null, {
+                      success: function(appointment) {
+                        res.status(200).json({code: 1});
+                      },
+                      error: function(error) {
+                        res.status(400).json(error);
+                      }
+                    }); //appointment.save
+                  }
+                  else {
+                    res.status(400).json({code: 0, message: "Already exists!"});
+                  }
+                },
+                error: function(error) {
+                  res.status(400).json(error);
+                }
+              }); //newquery.first
+            },
+            error: function(error) {
+              res.status(400).json(error);
+            }
+          }); //findPatient
+        },
+        error: function(error) {
+          res.status(400).json(error);
+        }
+      }); //isDoctor
+    },
+    error: function(error) {
+      res.status(400).json(error);
+    }
+  }); //checkSession
+});
+
 module.exports = router;

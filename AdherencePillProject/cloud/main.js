@@ -58,6 +58,7 @@ Parse.Cloud.define('requirePasswordResetting', function (req, res) {
     var email = req.params.email;
     var query = new Parse.Query(Parse.User);
     query.equalTo("email", email);
+    console.log(email);
     query.first({
         success: function success(user) {
             var firstname = user.get("firstname");

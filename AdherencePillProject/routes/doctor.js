@@ -113,8 +113,10 @@ router.get('/patients', function(req, res, next) {
         .json({"code": error.code, "message": error.message});
     }
   });
-})
+});
 
+
+//add a new prescription for a patient
 router.post('/patient/prescription', function(req, res, next) {
   checkSession(req.get("x-parse-session-token"), {
     success: function(user) {
@@ -127,6 +129,16 @@ router.post('/patient/prescription', function(req, res, next) {
                   var Schedule = new Parse.Object.extend("Schedule");
                   var schedule = new Schedule();
                   schedule.set("times", req.body.times);
+
+                  /* Do we need to add the basic information such as doctor and patient into the schedule?
+                   * Or if prescription contains the schedule, and the schedule only contains the time. Can we
+                   * just move the time to the prescription and discard schedule? Which is better?
+                   * If we keep both, which one is more important to the doctor. Schedule? Or Prescription?
+                   */
+                  //schedule.set("doctor", doctor);
+                  //schedule.set("patient", patient);
+
+
                   schedule.save(null, {
                     success: function(schedule) {
                       var Prescription = new Parse.Object.extend("Prescription");
@@ -136,15 +148,44 @@ router.post('/patient/prescription', function(req, res, next) {
                       prescription.set("note", req.body.note);
                       prescription.set("doctor", doctor);
                       prescription.set("patient", patient);
-                      prescription.set("pill", pill);
-                      prescription.save(null, {
-                        success: function(prescription) {
-                          res.status(201).json({code: 1});
+
+                      //pill should be changed to the bottle.
+                      //prescription.set("pill", pill);
+                      var Bottle = new Parse.Object.extend("Bottle");
+                      var bottle = new Bottle();
+                      bottle.set("owner", patient);
+
+                      /* the reasons why we need to add doctor to the bottle are
+                       * 1. it's much easier to get bottle information of the patients of one specific doctor
+                       * 2. one patient can have many doctors, if we search bottle information of a patient of a doctor,
+                       *    it will take more steps to decide whether this bottle is assigned by this doctor.
+                       */
+                      bottle.set("doctor", doctor);
+
+                      var name = pill.get("pillName");
+                      bottle.set("name", name);
+
+                      /* This information should be taken from the information of that pill.
+                       * So we need standard pill number in the pillLab.
+                       */
+                      bottle.set("pillNumber", 5);
+
+                      bottle.save(null, {
+                        success: function success(bottle) {
+                          prescription.set("bottle", bottle);
+                          prescription.save(null, {
+                            success: function(prescription) {
+                              res.status(201).json({code: 1});
+                            },
+                            error: function(error) {
+                              res.status(400).json(error);
+                            }
+                          });
                         },
-                        error: function(error) {
+                        error: function error(error) {
                           res.status(400).json(error);
                         }
-                      })
+                      });
                     },
                     error: function(error) {
                       res.status(400).json(error);
@@ -170,6 +211,58 @@ router.post('/patient/prescription', function(req, res, next) {
       res.status(400).json(error);
     }
   }); //checkSession
+});
+
+//get all of the bottles' information of all the patients who belongs to the doctor
+router.get('/patients/prescriptions', function(req, res) {
+  var session = req.get("x-parse-session-token");
+  checkSession(session, {
+    success: function success(user) {
+      isDoctor(user.id, {
+        success: function success(doctor) {
+          var Bottle = Parse.Object.extend("Bottle");
+          var query = new Parse.Query(Bottle);
+          query.include("owner");
+          query.include("owner.user");
+          query.equalTo("doctor", doctor);
+          query.find({
+            success: function success(bottles) {
+              var ret = {};
+              console.log(bottles);
+              for (var i = 0; i < bottles.length; ++i) {
+                console.log(bottles[i].get("owner").get("user").id);
+                var entry = {
+                  name: bottles[i].get("name"),
+                  pillNumber: bottles[i].get("pillNumber")
+                };
+                if (ret.hasOwnProperty(bottles[i].get("owner").get("user").id)) {
+                  console.log("yes");
+                  ret[bottles[i].get("owner").get("user").id]["bottle"].push(entry);
+                } else {
+                  var info = {
+                    firstname: bottles[i].get("owner").get("user").get("firstname"),
+                    lastname: bottles[i].get("owner").get("user").get("lastname"),
+                    bottle: [entry]
+                  }
+                  ret[bottles[i].get("owner").get("user").id] = info;
+                }
+              }
+              res.json(ret);
+            },
+            error: function error(error) {
+              res.status(400).json(error);
+            }
+          });
+        },
+        error: function(error) {
+          res.status(400).json(error);
+        }
+      });
+    },
+    error: function(error) {
+      res.status(400).json(error);
+    }
+  });
 });
 
 router.get('/patient/prescription', function(req, res, next) {
@@ -200,7 +293,7 @@ router.get('/patient/prescription', function(req, res, next) {
                 var _patient = new patients();
                 _patient.id = patient.id;
                 query.include("schedule");
-                query.include("pill");
+                query.include("bottle");
                 query.equalTo("doctor", _doctor);
                 query.equalTo("patient", _patient);
                 query.find({
@@ -210,7 +303,7 @@ router.get('/patient/prescription', function(req, res, next) {
                       ret.push({
                         id: results[i].id,
                         name: results[i].get("name"),
-                        pill: results[i].get("pill"),
+                        pill: results[i].get("bottle"),
                         note: results[i].get("note"),
                         times: results[i].get("schedule").get("times")
                       });

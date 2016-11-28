@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var utility = require('utility');
 var mail = require('../common/mail');
+var checkSession = require('./utility').checkSession;
 
 
 /* Active the email of an account
@@ -57,7 +58,38 @@ router.put('/password', function(req, res) {
 
 /* Update the basic information of an account */
 router.put('/info', function(req, res) {
-
+    var session = req.get('x-parse-session-token');
+    checkSession(session, {
+        success: function success(user) {
+            var firstname = req.body.firstname;
+            var gender = req.body.gender;
+            var email = req.body.email;
+            var phone = req.body.phone;
+            if (firstname !== undefined) {
+                user.set("firstname", firstname);
+            }
+            if (gender !== undefined) {
+                user.set("gender", gender);
+            }
+            if (email !== undefined) {
+                user.set("email", email);
+            }
+            if (phone !== undefined) {
+                user.set("phone", phone);
+            }
+            user.save(null, {
+                success: function(user) {
+                    res.status(200).json({code: 1, user: user});
+                },
+                error: function error(error) {
+                    res.status(400).json(error);
+                }
+            });
+        },
+        error: function error(error) {
+            res.status(400).json(error);
+        }
+    });
 });
 
 module.exports = router;

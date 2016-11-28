@@ -10,8 +10,8 @@ dotenv.load();
 
 var routes = require('./routes/index');
 var user = require('./routes/user');
-var login = require('./routes/login');
-var logout = require('./routes/logout');
+//var login = require('./routes/login');
+//var logout = require('./routes/logout');
 var password = require('./routes/password');
 var doctor = require('./routes/doctor');
 var patient = require('./routes/patient');
@@ -60,8 +60,8 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/user', user);
-app.use('/login', login);
-app.use('/logout', logout);
+//app.use('/login', login);
+//app.use('/logout', logout);
 app.use('/password', password);
 app.use('/patient', patient);
 app.use('/doctor', doctor);

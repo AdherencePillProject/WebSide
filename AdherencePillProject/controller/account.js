@@ -1,14 +1,9 @@
-var express = require('express');
-var router = express.Router();
-var utility = require('utility');
-var mail = require('../common/mail');
+/**
+ * Created by yichengwang on 28/11/2016.
+ */
 var checkSession = require('./utility').checkSession;
 
-
-/* Active the email of an account
-* "This actually should be PUT Request, and it will be change in the future."
-*/
-router.get('/email', function(req, res, next) {
+exports.activateEmail = function(req, res) {
     var token = req.query.key;
     var email = req.query.email;
     var firstname = req.query.firstname;
@@ -22,10 +17,9 @@ router.get('/email', function(req, res, next) {
             res.json({code: 0, message: "fail"});
         }
     });
-});
+};
 
-/* Get the email of resetting the password of an account */
-router.post('/password', function(req, res) {
+exports.sendPasswordResettingEmail = function(req, res) {
     var email = req.body.email;
     Parse.Cloud.run('requirePasswordResetting', {email: email}, {
         success: function success(message) {
@@ -37,10 +31,9 @@ router.post('/password', function(req, res) {
             res.json({code: 0, message: "fail"});
         }
     });
-});
+};
 
-/* Update the password of an account */
-router.put('/password', function(req, res) {
+exports.resetPassword = function(req, res) {
     var email = req.body.email;
     var token = req.body.key;
     var password = req.body.password;
@@ -54,10 +47,9 @@ router.put('/password', function(req, res) {
             res.json({code: 0, message: "fail"});
         }
     });
-});
+};
 
-/* Update the basic information of an account */
-router.put('/info', function(req, res) {
+exports.editAccount = function(req, res) {
     var session = req.get('x-parse-session-token');
     checkSession(session, {
         success: function success(user) {
@@ -90,6 +82,4 @@ router.put('/info', function(req, res) {
             res.status(400).json(error);
         }
     });
-});
-
-module.exports = router;
+};

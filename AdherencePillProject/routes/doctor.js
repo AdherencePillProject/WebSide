@@ -138,6 +138,9 @@ router.post('/patient/prescription', function(req, res, next) {
                   //schedule.set("doctor", doctor);
                   //schedule.set("patient", patient);
 
+                  /* Save the schedule which is assigned by the doctor in the prescription or in the bottle table?
+                   * which is better?
+                   */
 
                   schedule.save(null, {
                     success: function(schedule) {
@@ -163,6 +166,10 @@ router.post('/patient/prescription', function(req, res, next) {
                       bottle.set("doctor", doctor);
 
                       var name = pill.get("pillName");
+
+                      /* save the name of the pill, need to think about which is better, just the name of the pill, or
+                       * or the objectId of this pill? which is better?
+                       */
                       bottle.set("name", name);
 
                       /* This information should be taken from the information of that pill.
@@ -224,19 +231,32 @@ router.get('/patients/prescriptions', function(req, res) {
           var query = new Parse.Query(Bottle);
           query.include("owner");
           query.include("owner.user");
+          query.include("schedules");
           query.equalTo("doctor", doctor);
           query.find({
             success: function success(bottles) {
+              //res.json(bottles);
               var ret = {};
-              console.log(bottles);
               for (var i = 0; i < bottles.length; ++i) {
-                console.log(bottles[i].get("owner").get("user").id);
+                var bottleSchedules = bottles[i].get("schedules");
+                var schedules = [];
+                console.log("here1");
+                if (bottleSchedules) {
+                  for (var j = 0; j < bottleSchedules.length; ++j) {
+                    var entry = {
+                      number: bottleSchedules[j].get("number"),
+                      date: bottleSchedules[j].get("date")
+                    };
+                    schedules.push(entry);
+                  }
+                }
+                console.log("here2");
                 var entry = {
                   name: bottles[i].get("name"),
-                  pillNumber: bottles[i].get("pillNumber")
+                  pillNumber: bottles[i].get("pillNumber"),
+                  schedules: schedules
                 };
                 if (ret.hasOwnProperty(bottles[i].get("owner").get("user").id)) {
-                  console.log("yes");
                   ret[bottles[i].get("owner").get("user").id]["bottle"].push(entry);
                 } else {
                   var info = {

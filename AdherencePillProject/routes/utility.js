@@ -28,14 +28,12 @@ function addPerson (userInfo, type, callback) {
 exports.checkSession = function(session, callback) {
   if (!session) {
     return callback.error({code: 201, massage: "Invalid session"})
-  }
-  else {
+  } else {
     Parse.User.become(session, {
       success: function(user) {
         if (user) {
           return callback.success(user);
-        }
-        else {
+        } else {
           return callback.error({code: 201, massage: "Invalid session"})
         }
       },
@@ -44,7 +42,7 @@ exports.checkSession = function(session, callback) {
       }
     });
   }
-}
+};
 
 exports.getPatientProfile = function(userId, callback) {
   var patient = Parse.Object.extend("Patient");
@@ -154,6 +152,7 @@ exports.findPill = function(pillId, callback) {
 exports.signUpUser = function(userInfo, type, callback) {
   // TODO: Check body
   var newUser = new Parse.User();
+  console.log(userInfo);
 
   // TODO: Check parameters value valid
   newUser.set("username", userInfo.email);
@@ -176,10 +175,10 @@ exports.signUpUser = function(userInfo, type, callback) {
           // console.log(pointer);
           // user.set(pointer, person);
           if (type.toLowerCase() === 'patient') {
-            user.set(type, 1);
+            user.set('type', 1);
           }
           else if (type.toLowerCase() === 'doctor') {
-            user.set(type, 10);
+            user.set('type', 10);
           }
           user.save(null, {
             success: function() {

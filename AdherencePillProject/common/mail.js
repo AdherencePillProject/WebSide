@@ -39,7 +39,7 @@ function sendEmail(data, info, callback) {
             });
             console.log(info.type);
             var htmlInfo = {
-                host: process.env.SITE_ROOT_URL || "http://localhost:5000",
+                host: "http://localhost:5000",
                 type: info.type,
                 token: info.token,
                 email: info.email,

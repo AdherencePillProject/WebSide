@@ -152,6 +152,7 @@ exports.findPill = function(pillId, callback) {
 exports.signUpUser = function(userInfo, type, callback) {
   // TODO: Check body
   var newUser = new Parse.User();
+  console.log(userInfo);
 
   // TODO: Check parameters value valid
   newUser.set("username", userInfo.email);

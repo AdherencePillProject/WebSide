@@ -28,6 +28,7 @@ router.get('/', function(req, res, next) {
 
 /* POST sign up a new patient */
 router.post('/', function(req, res, next) {
+  console.log(req.body);
   signUpUser(req.body, "Patient", {
     success: function success (user) {
       var sessionToken = user.getSessionToken();

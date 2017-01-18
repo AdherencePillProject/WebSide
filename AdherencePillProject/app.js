@@ -41,6 +41,7 @@ var api = new ParseServer({
   cloud: process.env.CLOUD_CODE_MAIN || './cloud/main.js',
   appId: process.env.APP_ID || 'myAppId',
   masterKey: process.env.MASTER_KEY || 'myMasterKey',
+  clientKey: 'myClientKey',
   serverURL: process.env.SERVER_URL || 'http://localhost:5000/parse',
   liveQuery: {
     classNames: ["Posts", "Comments"]

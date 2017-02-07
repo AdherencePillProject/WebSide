@@ -88,7 +88,28 @@ exports.isDoctor = function(userId, callback) {
       return callback.error(error);
     }
   });
-}
+};
+
+exports.isPatient = function(userId, callback) {
+  var Patient = Parse.Object.extend("Patient");
+  var user = new Parse.User();
+  user.id = userId;
+  var query = new Parse.Query(Patient);
+  query.include("user");
+  query.equalTo("user", user);
+  query.first({
+    success: function success(patient) {
+      if (patient) {
+        return callback.success(patient);
+      } else {
+        return callback.error({code: -1, message: "Patient not found"});
+      }
+    },
+    error: function(error) {
+      return callback.error(error);
+    }
+  });
+};
 
 exports.findPatient = function(patientId, callback) {
   var Patient = Parse.Object.extend("Patient");

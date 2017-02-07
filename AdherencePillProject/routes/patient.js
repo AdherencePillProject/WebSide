@@ -6,6 +6,7 @@ var addPatientDoctorRelation = utility.addPatientDoctorRelation;
 var findDoctor = utility.findDoctor;
 var checkSession = utility.checkSession;
 var getPatientProfile = utility.getPatientProfile;
+var isPatient = utility.isPatient;
 
 /* GET get the information of the patient */
 router.get('/', function(req, res, next) {
@@ -233,6 +234,37 @@ router.get('/pills', function(req, res) {
           .json({code: error.code, message: error.message});
     }
   });//checkSession
+});
+
+router.get('/bottles', function(req, res) {
+  var sessionToken = req.get("x-parse-session-token");
+  checkSession(sessionToken, {
+    success: function success(user) {
+      isPatient(user.id, {
+        success: function success(patient) {
+          var Bottle = Parse.Object.extend("BottleUpdates");
+          var bottle = new Bottle();
+          var query = new Parse.Query(Bottle);
+          query.include("schedules");
+          query.equalTo("owner", patient);
+          query.find({
+            success: function success(bottles) {
+              res.json(bottles);
+            },
+            error: function error(err) {
+              res.status(400).json(err);
+            }
+          })
+        },
+        error: function error(err) {
+          res.status(400).json(err);
+        }
+      });
+    },
+    error: function error(err) {
+      res.status(400).json(error);
+    }
+  });
 });
 
 module.exports = router;

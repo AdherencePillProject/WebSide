@@ -503,4 +503,84 @@ router.post('/appointment', function(req, res, next) {
   }); //checkSession
 });
 
+router.get('/patient/bottles', function(req, res) {
+  var sessionToken = req.get("x-parse-session-token");
+  checkSession(sessionToken, {
+    success: function success(user) {
+      isDoctor(user.id, {
+        success: function success(doctor) {
+          findPatient(req.query.patientId, {
+            success: function success(patient) {
+              var Bottle = new Parse.Object.extend("Bottle");
+              var query = new Parse.Query(Bottle);
+              query.equalTo("doctor", doctor);
+              query.equalTo("owner", patient);
+              query.find({
+                success: function success(bottles) {
+                  //res.json(bottles);
+                  var nameSet = new Set();
+                  for (var i = 0; i < bottles.length; ++i) {
+                    var name = bottles[i].get("Name");
+                    if(name !== undefined) {
+                      nameSet.add(name);
+                    }
+                  }
+                  var names = Array.from(nameSet);
+                  var BottleUpdate = new Parse.Object.extend("BottleUpdates");
+                  var newQuery = new Parse.Query(BottleUpdate);
+                  newQuery.containedIn("Name", names);
+                  newQuery.find({
+                    success: function success(bottles) {
+                      var dict = [];
+                      for (var i = 0; i < bottles.length; ++i) {
+                        var name = bottles[i].get("Name");
+                        var entry = {
+                          battery: bottles[i].get("Battery"),
+                          units: bottles[i].get("Units"),
+                          timestamp: bottles[i].get("timeStamp"),
+                          voltage: bottles[i].get("Voltage"),
+                        };
+                        if (dict.hasOwnProperty(name)) {
+                          dict[name].push(entry);
+                        } else {
+                          dict[name] = [entry];
+                        }
+                      }
+                      var ret = [];
+                      for (var key in dict) {
+                        if (dict.hasOwnProperty(key)) {
+                          ret.push({
+                            name: key,
+                            updates: dict[key]
+                          });
+                        }
+                      }
+                      res.json(ret);
+                    },
+                    error: function error(err) {
+                      res.status(400).json(err);
+                    }
+                  });
+                },
+                error: function error(err) {
+                  res.status(400).json(err);
+                }
+              })
+            },
+            error: function error(err) {
+              res.status(400).json(err);
+            }
+          })
+        },
+        error: function error(err) {
+          res.status(400).json(err);
+        }
+      });
+    },
+    error: function error(err) {
+      res.status(400).json(err);
+    }
+  })
+});
+
 module.exports = router;

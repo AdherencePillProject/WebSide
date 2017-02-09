@@ -58,6 +58,8 @@ router.put('/bottle', bottle.updateBottle);
 //
 //router.get('/profile', );
 
+router.get('/patient/newbottle', bottle.getNewBottle);
+
 
 
 module.exports = router;

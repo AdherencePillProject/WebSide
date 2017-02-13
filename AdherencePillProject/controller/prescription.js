@@ -16,7 +16,7 @@ exports.getBottleInfo = function(req, res) {
             query.first({
                 success: function success(prescription) {
                     var nameSet = new Set();
-                    nameSet.add(prescription.get("bottle"));
+                    nameSet.add(prescription.get("bottle").get("name"));
                     var names = Array.from(nameSet);
                     var BottleUpdate = new Parse.Object.extend("BottleUpdates");
                     var newQuery = new Parse.Query(BottleUpdate);

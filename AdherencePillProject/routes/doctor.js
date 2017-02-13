@@ -357,6 +357,8 @@ router.get('/patient/prescription', function(req, res, next) {
   }
 })
 
+
+
 router.delete('/patient/prescription', function(req, res, next) {
   var sessionToken = req.get("x-parse-session-token");
   if (sessionToken) {

@@ -5,6 +5,7 @@ var login = controller.login;
 var logout = controller.logout;
 var account = controller.account;
 var bottle = controller.bottle;
+var prescription = controller.prescription;
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -60,6 +61,6 @@ router.put('/bottle', bottle.updateBottle);
 
 router.get('/patient/newbottle', bottle.getNewBottle);
 
-
+router.get('/prescription', prescription.getBottleInfo);
 
 module.exports = router;

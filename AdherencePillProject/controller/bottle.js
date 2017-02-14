@@ -110,38 +110,6 @@ exports.updateBottle = function(req, res) {
     });
 };
 
-exports.getNewBottle = function(req, res) {
-    var sessionToken = req.get("x-parse-session-token");
-    checkSession(sessionToken, {
-        success: function success(user) {
-            isPatient(user, {
-                success: function success(patient) {
-                    var Bottle = new Parse.Object.extend("Bottle");
-                    var query = new Parse.Query(Bottle);
-                    query.equalTo("owner", patient);
-                    query.equalTo("newAdded", true);
-                    // query.equalTo("Name", "true");
-                    var newBottles = [];
-                    query.each(function (newBottle, err) {
-                        newBottle.set("Name", "false");
-                        newBottle.save();
-                        newBottles.push(newBottle);
-                    }, {useMasterKey: true}).then(function() {
-                        res.json(newBottles);
-                    }, function(err) {
-                        res.status(400).json(err);
-                    });
-                },
-                error: function error(err) {
-                    res.status(400).json(err);
-                }
-            });
-        },
-        error: function error(err) {
-            res.status(400).json(err);
-        }
-    });
-}
 
 //exports.updateBottle = function(req, res) {
 //    var session = req.get('x-parse-session-token');

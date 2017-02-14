@@ -151,6 +151,7 @@ router.post('/patient/prescription', function(req, res, next) {
                       prescription.set("note", req.body.note);
                       prescription.set("doctor", doctor);
                       prescription.set("patient", patient);
+                      prescription.set("newAdded", true);
 
                       //pill should be changed to the bottle.
                       //prescription.set("pill", pill);
@@ -176,7 +177,7 @@ router.post('/patient/prescription', function(req, res, next) {
                        * So we need standard pill number in the pillLab.
                        */
                       bottle.set("pillNumber", 5);
-                      bottle.set("newAdded", true);
+                      
 
                       bottle.save(null, {
                         success: function success(bottle) {

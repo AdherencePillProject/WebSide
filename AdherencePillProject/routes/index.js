@@ -59,7 +59,7 @@ router.put('/bottle', bottle.updateBottle);
 //
 //router.get('/profile', );
 
-router.get('/patient/newbottle', bottle.getNewBottle);
+router.get('/patient/newPrescriptions', prescription.getNewPrescriptions);
 
 router.get('/prescription', prescription.getBottleInfo);
 

@@ -275,7 +275,6 @@ router.get('/prescriptions', function(req, res) {
         success: function success(patient) {
           var Prescription = new Parse.Object.extend("Prescription");
           var query = new Parse.Query(Prescription);
-          query.select("name", "note", "pill", "newAdded", "bottle.name", "bottle.pillNumber", "schedule");
           query.equalTo("patient", patient);
           query.include("schedule");
           query.include("bottle");

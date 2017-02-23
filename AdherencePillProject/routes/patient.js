@@ -294,7 +294,7 @@ router.get('/prescriptions', function(req, res) {
                   prescriptionName: prescriptions[i].get("name"),
                   bottle: bottle,
                   note: prescriptions[i].get("note"),
-                  schedule: prescriptions[i].get("schedule"),
+                  schedule: prescriptions[i].get("schedule").get("times"),
                   pill: prescriptions[i].get("pill"),
                   newAdded: prescriptions[i].get("newAdded")
                 };

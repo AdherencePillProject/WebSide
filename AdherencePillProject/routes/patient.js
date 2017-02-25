@@ -164,6 +164,7 @@ router.get('/prescription', function(req, res) {
           query.equalTo("patient", patient);
           query.include("schedule");
           query.include("pill");
+          query.include("objectId");
           query.find({
             success: function success(prescritions) {
               var ret = new Array();
@@ -172,7 +173,8 @@ router.get('/prescription', function(req, res) {
                   name: prescritions[i].get("name"),
                   pill: prescritions[i].get("pill"),
                   note: prescritions[i].get("note"),
-                  schedule: prescritions[i].get("schedule").get("times")
+                  schedule: prescritions[i].get("schedule").get("times"),
+                  objectId: prescriptions[i].get("objectId")
                 })
               }
               res.status(200).json(ret);

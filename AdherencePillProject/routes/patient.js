@@ -174,7 +174,7 @@ router.get('/prescription', function(req, res) {
                   pill: prescritions[i].get("pill"),
                   note: prescritions[i].get("note"),
                   schedule: prescritions[i].get("schedule").get("times"),
-                  objectId: prescriptions[i].get("objectId")
+                  objectId: prescritions[i].id
                 })
               }
               res.status(200).json(ret);

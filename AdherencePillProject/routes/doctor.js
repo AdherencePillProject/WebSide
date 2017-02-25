@@ -152,6 +152,7 @@ router.post('/patient/prescription', function(req, res, next) {
                       prescription.set("doctor", doctor);
                       prescription.set("patient", patient);
                       prescription.set("newAdded", true);
+		      prescription.set("pill", req.body.pillName);
 
                       //pill should be changed to the bottle.
                       //prescription.set("pill", pill);

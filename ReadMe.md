@@ -1,10 +1,10 @@
-#AdherencePill Project Backend Implementation
+# AdherencePill Project Backend Implementation
 In the back-end side, we mainly supply the **RESTful API** for the front-end side and provide the data to them so that in the front-end, people can only focus on the [page word](https://github.com/AdherencePillProject/web_cloud). No need to think about how to retrieve data and how to communicate with database.
 
 Here, we will give introduce two important things for both the front-end and back-end people to have a better communication with each other.
 
 ##Structure of the Database
-####**There are 5 important tables:**
+#### **There are 5 important tables:**
 
 ```
 1. User
@@ -14,7 +14,7 @@ Here, we will give introduce two important things for both the front-end and bac
 5. Prescription
 ```
 
-####**User**
+#### **User**
 This table is the most important table for the user management which is the build-in class of the Parse Server and it contains these fields:
 
 ```
@@ -31,7 +31,7 @@ This table is the most important table for the user management which is the buil
 11. doctorPointer(point to the corresponding doctor in the Doctor table if this user is a doctor)
 ```
 
-####**Patient**
+#### **Patient**
 This table is to store the user which is a patient and it contains these fields:
 
 ```
@@ -39,7 +39,7 @@ This table is to store the user which is a patient and it contains these fields:
 2. userAccount(point to the corresponding user in the User table)
 ```
 
-####**Doctor**
+#### **Doctor**
 This table is to store the user which is a doctor and it contains these fields:
 
 ```
@@ -50,7 +50,7 @@ This table is to store the user which is a doctor and it contains these fields:
 5. hospitalCity
 ```
 
-####**Appointment**
+#### **Appointment**
 This table is to store the appointment made between a patient and a doctor and it contains these fields:
 
 ```
@@ -61,7 +61,7 @@ This table is to store the appointment made between a patient and a doctor and i
 ```
 
 
-####**Prescription**
+#### **Prescription**
 This table is to store the patient's prescription and it contains these fields:
 
 ```
@@ -78,7 +78,7 @@ This table is to store the patient's prescription and it contains these fields:
 ```
 
 
-##RESTful API
+## RESTful API
 ```
 GET
 1. /account?

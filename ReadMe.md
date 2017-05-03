@@ -3,7 +3,7 @@ In the back-end side, we mainly supply the **RESTful API** for the front-end sid
 
 Here, we will give introduce two important things for both the front-end and back-end people to have a better communication with each other.
 
-##Structure of the Database
+## Structure of the Database
 #### **There are 5 important tables:**
 
 ```

@@ -46,7 +46,7 @@ exports.login = function(req, res) {
     } else {
         Parse.User.logIn(username, password, {
             success: function (user) {
-                res.json({"code": 1, "sessionToken": user.attributes.sessionToken, "bottle": "SC36-05  4C:55:CC:10:7B:12"});
+                res.json({"code": 1, "sessionToken": user.attributes.sessionToken, "bottle": 2});
             },
             error: function (user, error) {
                 console.log(error);

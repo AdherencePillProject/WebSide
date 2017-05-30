@@ -46,7 +46,7 @@ router.post('/', function(req, res, next) {
   } else {
     Parse.User.logIn(username, password, {
       success: function (user) {
-        res.json({"code": 1, "sessionToken": user.attributes.sessionToken});
+        res.json({"code": 5, "sessionToken": user.attributes.sessionToken});
       },
       error: function (user, error) {
         console.log(error);

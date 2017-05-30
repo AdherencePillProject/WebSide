@@ -37,7 +37,7 @@ var allowCrossDomain = function(req, res, next) {
 app.use(allowCrossDomain);
 // Set Parse Server env
 var api = new ParseServer({
-  databaseURI: process.env.DATABASE_URI || 'mongodb://localhost:27017/adherence',
+  databaseURI: process.env.DATABASE_URI || 'mongodb://129.105.36.93:5000/adherence',
   cloud: process.env.CLOUD_CODE_MAIN || './cloud/main.js',
   appId: process.env.APP_ID || 'myAppId',
   masterKey: process.env.MASTER_KEY || 'myMasterKey',

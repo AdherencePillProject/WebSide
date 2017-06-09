@@ -37,12 +37,14 @@ var allowCrossDomain = function(req, res, next) {
 app.use(allowCrossDomain);
 // Set Parse Server env
 var api = new ParseServer({
-  databaseURI: process.env.DATABASE_URI || 'mongodb://129.105.36.93:5000/adherence',
+  databaseURI: process.env.DATABASE_URI || 'mongodb://ec2-13-59-253-73.us-east-2.compute.amazonaws.com:5000/adherence',
+  // databaseURI: process.env.DATABASE_URI || 'mongodb://127.0.0.1:27017/adherence',
   cloud: process.env.CLOUD_CODE_MAIN || './cloud/main.js',
   appId: process.env.APP_ID || 'myAppId',
   masterKey: process.env.MASTER_KEY || 'myMasterKey',
   clientKey: 'myClientKey',
-  serverURL: process.env.SERVER_URL || 'http://localhost:5000/parse',
+  serverURL: process.env.SERVER_URL || 'http://ec2-13-59-253-73.us-east-2.compute.amazonaws.com:5000/parse',
+  // serverURL: process.env.SERVER_URL || 'http://127.0.0.1:5000/parse',
   liveQuery: {
     classNames: ["Posts", "Comments"]
   }

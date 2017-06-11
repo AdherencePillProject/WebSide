@@ -32,7 +32,7 @@ Parse.Cloud.define('resetPassword', function(req, res) {
     var password = req.params.password;
 
     var query = new Parse.Query(Parse.User);
-    //console.log(email);
+    
     query.equalTo("email", email);
     query.equalTo("passwordResettingToken", token);
     query.first({

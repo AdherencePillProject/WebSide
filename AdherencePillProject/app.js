@@ -10,8 +10,6 @@ dotenv.load();
 
 var routes = require('./routes/index');
 var user = require('./routes/user');
-//var login = require('./routes/login');
-//var logout = require('./routes/logout');
 var password = require('./routes/password');
 var doctor = require('./routes/doctor');
 var patient = require('./routes/patient');
@@ -37,14 +35,15 @@ var allowCrossDomain = function(req, res, next) {
 app.use(allowCrossDomain);
 // Set Parse Server env
 var api = new ParseServer({
-  databaseURI: process.env.DATABASE_URI || 'mongodb://ec2-13-59-253-73.us-east-2.compute.amazonaws.com:5000/adherence',
-  // databaseURI: process.env.DATABASE_URI || 'mongodb://127.0.0.1:27017/adherence',
+  databaseURI: process.env.DATABASE_URI || 'mongodb://localhost:27017/parse',
+  // databaseURI: process.env.DATABASE_URI || '',
+  // databaseURI: process.env.DATABASE_URI || 'mongodb://129.105.36.93:5000/adherence',
   cloud: process.env.CLOUD_CODE_MAIN || './cloud/main.js',
   appId: process.env.APP_ID || 'myAppId',
   masterKey: process.env.MASTER_KEY || 'myMasterKey',
-  clientKey: 'myClientKey',
-  serverURL: process.env.SERVER_URL || 'http://ec2-13-59-253-73.us-east-2.compute.amazonaws.com:5000/parse',
-  // serverURL: process.env.SERVER_URL || 'http://127.0.0.1:5000/parse',
+  // clientKey: 'myClientKey',
+  serverURL: process.env.SERVER_URL || '',
+  // serverURL: process.env.SERVER_URL || 'http://localhost:5000/parse',
   liveQuery: {
     classNames: ["Posts", "Comments"]
   }
@@ -52,26 +51,20 @@ var api = new ParseServer({
 var mountPath = process.env.PARSE_MOUNT || '/parse';
 app.use(mountPath, api);
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use('/public', express.static(path.join(__dirname, 'public')));
-// app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/user', user);
-//app.use('/login', login);
-//app.use('/logout', logout);
 app.use('/password', password);
 app.use('/patient', patient);
 app.use('/doctor', doctor);
 app.use('/pharmacy', pharmacy);
 app.use('/test', tests);
 app.use('/account', account);
-
 
 // catch 404 and forward to error handler
 app.use(function(err, req, res, next) {

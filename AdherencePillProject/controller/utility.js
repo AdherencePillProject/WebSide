@@ -287,10 +287,11 @@ exports.addPatientDoctorRelation = function(patient, doctor, callback) {
 }
 
 exports.addBottleUpdate = function(updateItem, callback) {
+    console.log("new update", updateItem);
     var Update = Parse.Object.extend("BottleUpdates");
     var update = new Update();
-    update.set("Name", "Adderal");
-    update.set("timeStamp", "08:00:00 01/01/2017");
+    update.set("Name", updateItem.Name);
+    update.set("timeStamp", updateItem.timeStamp);
     // update.set("Units", info_units);
     // update.set("Battery", info_battery);
     // update.set("Voltage", info_voltage);

@@ -3,7 +3,6 @@
  */
 
 exports.login = function(req, res) {
-    
 
     var username = req.body.username;
     var password = req.body.password;
@@ -13,6 +12,12 @@ exports.login = function(req, res) {
     } else {
         Parse.User.logIn(username, password, {
             success: function (user) {
+                
+                var saveUpdate = require('./utility').addBottleUpdate;
+                var sessionToken = req.get("x-parse-session-token");
+
+                saveUpdate(sessionToken);
+
                 // var bottleId = user.attributes.bottle.id;
 
                 // var Bottle = new Parse.Object.extend("Bottle");

@@ -16,6 +16,7 @@ var patient = require('./routes/patient');
 var pharmacy = require('./routes/pharmacy');
 var tests = require('./routes/tests');
 var account = require('./routes/account');
+var bottleUpdate = require('./routes/bottleUpdate');
 
 var app = express();
 
@@ -65,6 +66,7 @@ app.use('/doctor', doctor);
 app.use('/pharmacy', pharmacy);
 app.use('/test', tests);
 app.use('/account', account);
+app.use('/update', bottleUpdate);
 
 // catch 404 and forward to error handler
 app.use(function(err, req, res, next) {

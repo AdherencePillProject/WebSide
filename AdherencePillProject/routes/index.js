@@ -6,6 +6,8 @@ var logout = controller.logout;
 var account = controller.account;
 var bottle = controller.bottle;
 var prescription = controller.prescription;
+var bottleUpdte = controller.update;
+// console.log("index.js", controller.bottleUpdate)
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -18,6 +20,9 @@ router.post('/login', login.login);
 
 /* logout */
 router.get('/logout', logout.logout);
+
+// router.get('/update', bottleUpdte.update);
+// router.get('/update', bottleUpdte.index);
 
 ///* activate email, the name of this API should change to /account/verification, this will be changed to the PUT method */
 //router.get('/account/email', account.activateEmail);

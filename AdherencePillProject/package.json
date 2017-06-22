@@ -23,8 +23,5 @@
     "parse-server": "2.2.*",
     "serve-favicon": "~2.3.0",
     "utility": "^1.8.0"
-  },
-  "devDependencies": {
-    "parser": "^0.1.4"
   }
 }

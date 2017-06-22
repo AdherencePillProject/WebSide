@@ -7,7 +7,6 @@ var account = controller.account;
 var bottle = controller.bottle;
 var prescription = controller.prescription;
 var bottleUpdte = controller.bottleUpdate;
-console.log("index.js", controller.bottleUpdate)
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -21,7 +20,6 @@ router.post('/login', login.login);
 router.get('/logout', logout.logout);
 
 
-console.log(bottleUpdte);
 router.post('/bottleUpdate', bottleUpdte.test);
 // router.get('/update', bottleUpdte.index);
 

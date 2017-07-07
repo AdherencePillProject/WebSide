@@ -20,7 +20,8 @@ router.post('/login', login.login);
 router.get('/logout', logout.logout);
 
 
-router.post('/bottleUpdate', bottleUpdte.test);
+router.post('/bottleUpdate', bottleUpdte.addUpdate);
+router.delete('/bottleUpdate', bottleUpdte.deleteUpdateObject);
 // router.get('/update', bottleUpdte.index);
 
 ///* activate email, the name of this API should change to /account/verification, this will be changed to the PUT method */

@@ -287,7 +287,6 @@ exports.addPatientDoctorRelation = function(patient, doctor, callback) {
 }
 
 exports.addBottleUpdate = function(updateItem, callback) {
-    console.log("new update", updateItem);
     var Update = Parse.Object.extend("BottleUpdates");
     var update = new Update();
     update.set("Name", updateItem.Name);
@@ -308,4 +307,42 @@ exports.addBottleUpdate = function(updateItem, callback) {
             alert('Failed to create new object, with error code: ' + error.message);
         }
     });
+}
+
+
+exports.removeUpdate = function(updateItem, callback) {
+    console.log("remove the update");
+
+    var update = new Parse.Object.extend("BottleUpdates");
+    var query = new Parse.Query(update);
+
+    var testStr = "09:00:00 01/01/2017";
+    var targetDate = updateItem.timeStamp.substring(9, 19);
+    console.log(targetDate);
+
+    query.equalTo("Name", updateItem.Name);
+    // query.equalTo("timeStamp", "09:00:00 01/01/2017");
+    query.find(
+        {
+            success: function(updates) {
+                for (var data of updates) {
+                    var curDate = data.get("timeStamp").substring(9, 19);
+                    
+                    if (curDate == targetDate) {
+                        data.destroy({
+                            success: function(obj) {
+                                console.log("erased");
+                            },
+                            error: function(obj, err) {
+                                console.log("not erase");
+                            }
+                        });
+                    }
+                }
+                
+            },
+            error: function(err) {
+                console.log("err");
+            }
+        })
 }

@@ -7,4 +7,4 @@ exports.logout = require('./logout');
 exports.account = require('./account');
 exports.bottle = require('./bottle');
 exports.prescription = require('./prescription');
-exports.bottleUpdate = require('./bottleUpdate')
+exports.bottleUpdate = require('./bottleUpdate');

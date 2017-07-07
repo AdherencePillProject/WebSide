@@ -7,6 +7,7 @@ var account = controller.account;
 var bottle = controller.bottle;
 var prescription = controller.prescription;
 var bottleUpdte = controller.bottleUpdate;
+var bottleWifi = controller.bottleWifi;
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -23,6 +24,7 @@ router.get('/logout', logout.logout);
 router.post('/bottleUpdate', bottleUpdte.addUpdate);
 router.delete('/bottleUpdate', bottleUpdte.deleteUpdateObject);
 // router.get('/update', bottleUpdte.index);
+router.get('/bottleWifi', bottleWifi.addData);
 
 ///* activate email, the name of this API should change to /account/verification, this will be changed to the PUT method */
 //router.get('/account/email', account.activateEmail);

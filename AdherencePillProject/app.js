@@ -17,6 +17,7 @@ var pharmacy = require('./routes/pharmacy');
 var tests = require('./routes/tests');
 var account = require('./routes/account');
 var bottleUpdate = require('./routes/bottleUpdate');
+var bottleWifi = require('./routes/bottleWifi');
 
 var app = express();
 
@@ -67,6 +68,7 @@ app.use('/pharmacy', pharmacy);
 app.use('/test', tests);
 app.use('/account', account);
 app.use('/update', bottleUpdate);
+app.use('/bottleWifi', bottleWifi);
 
 
 // catch 404 and forward to error handler

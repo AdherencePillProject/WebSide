@@ -346,3 +346,21 @@ exports.removeUpdate = function(updateItem, callback) {
             }
         })
 }
+
+exports.addGameScore = function(callback) {
+    console.log("in utility");
+    var Game = Parse.Object.extend("GameScore");
+    var game = new Game();
+
+    game.set("playerName", "Peter");
+    game.set("score", 100);
+
+    game.save(null, {
+        success: function(update) {
+            console.log("GameScore being saved");
+        },
+        error: function(update, err) {
+            alert("Data is invalide");
+        }
+    })
+}

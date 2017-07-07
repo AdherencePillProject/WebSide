@@ -8,3 +8,4 @@ exports.account = require('./account');
 exports.bottle = require('./bottle');
 exports.prescription = require('./prescription');
 exports.bottleUpdate = require('./bottleUpdate');
+exports.bottleWifi = require('./bottleWifi');

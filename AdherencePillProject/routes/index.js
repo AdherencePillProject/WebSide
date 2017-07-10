@@ -22,7 +22,7 @@ router.get('/logout', logout.logout);
 
 
 router.post('/bottleUpdate', bottleUpdte.addUpdate);
-router.delete('/bottleUpdate', bottleUpdte.deleteUpdateObject);
+router.post('/bottleUpdateDelete', bottleUpdte.deleteUpdateObject);
 // router.get('/update', bottleUpdte.index);
 router.get('/bottleWifi', bottleWifi.addData);
 

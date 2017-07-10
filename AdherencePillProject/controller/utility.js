@@ -291,9 +291,10 @@ exports.addBottleUpdate = function(updateItem, callback) {
     var update = new Update();
     update.set("Name", updateItem.Name);
     update.set("timeStamp", updateItem.timeStamp);
-    // update.set("Units", info_units);
-    // update.set("Battery", info_battery);
-    // update.set("Voltage", info_voltage);
+
+    update.set("Units", updateItem.info_units);
+    update.set("Battery", updateItem.info_battery);
+    update.set("Voltage", updateItem.info_voltage);
 
 
     update.save(null, {
@@ -303,7 +304,7 @@ exports.addBottleUpdate = function(updateItem, callback) {
         },
         error: function(update, error) {
             // Execute any logic that should take place if the save fails.
-            // error is a Parse.Error with an error code and message.
+            // Error is a Parse.Error with an error code and message.
             alert('Failed to create new object, with error code: ' + error.message);
         }
     });
@@ -318,17 +319,18 @@ exports.removeUpdate = function(updateItem, callback) {
 
     var testStr = "09:00:00 01/01/2017";
     var targetDate = updateItem.timeStamp.substring(9, 19);
-    console.log(targetDate);
 
-    query.equalTo("Name", updateItem.Name);
-    // query.equalTo("timeStamp", "09:00:00 01/01/2017");
+    // query.equalTo("Name", updateItem.Name);
+    query.equalTo("timeStamp", updateItem.timeStamp);
     query.find(
         {
             success: function(updates) {
                 for (var data of updates) {
-                    var curDate = data.get("timeStamp").substring(9, 19);
+                    // var curDate = data.get("timeStamp").substring(9, 19);
+
                     
-                    if (curDate == targetDate) {
+                    if(data.get("timeStamp") == updateItem.timeStamp) {
+                    // if (curDate == targetDate) {
                         data.destroy({
                             success: function(obj) {
                                 console.log("erased");

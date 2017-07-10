@@ -17,6 +17,7 @@ var pharmacy = require('./routes/pharmacy');
 var tests = require('./routes/tests');
 var account = require('./routes/account');
 var bottleUpdate = require('./routes/bottleUpdate');
+var bottleUpdateDelete = require('./routes/bottleUpdateDelete');
 var bottleWifi = require('./routes/bottleWifi');
 
 var app = express();

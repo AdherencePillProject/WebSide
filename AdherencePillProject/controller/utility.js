@@ -291,6 +291,7 @@ exports.addBottleUpdate = function(updateItem, callback) {
     var update = new Update();
     update.set("Name", updateItem.Name);
     update.set("timeStamp", updateItem.timeStamp);
+    update.set("taken", updateItem.taken);
 
     update.set("Units", updateItem.info_units);
     update.set("Battery", updateItem.info_battery);

@@ -32,6 +32,7 @@ exports.getBottleInfo = function(req, res) {
                                     units: bottles[i].get("Units"),
                                     timestamp: bottles[i].get("timeStamp"),
                                     voltage: bottles[i].get("Voltage"),
+                                    taken: bottles[i].get("taken"),
                                 };
                                 if (dict.hasOwnProperty(name)) {
                                     dict[name].push(entry);

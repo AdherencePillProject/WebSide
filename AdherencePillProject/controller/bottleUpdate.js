@@ -7,6 +7,9 @@ exports.addUpdate = function(req, res) {
     const time = req.body.timeStamp;
     const sessionToken = req.get("x-parse-session-token");
 
+    if (req.body.taken == undefined) 
+        req.body.taken = 0;
+
     if (name == undefined || time == undefined) {
         res.status(400)
             .json({code: "400", message: "undefined username or undefined password"});

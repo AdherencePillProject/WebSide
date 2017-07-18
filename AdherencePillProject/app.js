@@ -8,6 +8,7 @@ var ParseServer = require('parse-server').ParseServer;
 var dotenv = require('dotenv');
 dotenv.load();
 
+var fs = require('fs')
 var routes = require('./routes/index');
 var user = require('./routes/user');
 var password = require('./routes/password');
@@ -54,7 +55,8 @@ var api = new ParseServer({
 var mountPath = process.env.PARSE_MOUNT || '/parse';
 app.use(mountPath, api);
 
-app.use(logger('dev'));
+var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags: 'a'})
+app.use(logger('dev', {stream: accessLogStream}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());

@@ -29,7 +29,7 @@ router.post('/password', function(req, res) {
     var email = req.body.email;
     Parse.Cloud.run('requirePasswordResetting', {email: email}, {
         success: function success(message) {
-            console.log(message);
+            console.log(message, "666");
             res.json({code: 1, message: "success"});
         },
         error: function error(error) {

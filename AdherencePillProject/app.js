@@ -85,6 +85,19 @@ app.use(function(err, req, res, next) {
   }
 });
 
+app.post('/upload', function(req, res) {
+  console.log("hi");
+  
+  var writeStream = fs.createWriteStream('./res.jpeg');
+  req.pipe(writeStream);
+
+  req.on('end', function () {
+    res.writeHead(200, {"content-type":"text/html"});
+    res.end('<form method="POST"><input name="test" /><input type="submit"></form>');
+  });
+
+});
+
 // error handlers
 
 // development error handler

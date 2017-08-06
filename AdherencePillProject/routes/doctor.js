@@ -115,7 +115,6 @@ router.get('/patients', function(req, res, next) {
   });
 });
 
-
 //add a new prescription for a patient
 router.post('/patient/prescription', function(req, res, next) {
   checkSession(req.get("x-parse-session-token"), {
@@ -152,7 +151,7 @@ router.post('/patient/prescription', function(req, res, next) {
                       prescription.set("doctor", doctor);
                       prescription.set("patient", patient);
                       prescription.set("newAdded", true);
-		      prescription.set("pill", req.body.pillName);
+                      prescription.set("pill", req.body.pillName);
 
                       //pill should be changed to the bottle.
                       //prescription.set("pill", pill);

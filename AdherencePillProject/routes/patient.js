@@ -7,6 +7,7 @@ var findDoctor = utility.findDoctor;
 var checkSession = utility.checkSession;
 var getPatientProfile = utility.getPatientProfile;
 var isPatient = utility.isPatient;
+var addPatientDoctorRelationApply = utility.addPatientDoctorRelationApply;
 
 /* GET get the information of the patient */
 router.get('/', function(req, res, next) {
@@ -50,6 +51,10 @@ router.post('/appointment', function(req, res) {
         success: function(doctor) {
           getPatientProfile(user.id, {
             success: function(patient) {
+              console.log("appointment", doctor, patient);
+
+              addPatientDoctorRelationApply(doctor, patient);
+
               var Appointment = new Parse.Object.extend("Appointment");
               var appointment = new Appointment();
               var newQuery = new Parse.Query(Appointment);
@@ -57,8 +62,10 @@ router.post('/appointment', function(req, res) {
               newQuery.equalTo("doctor", doctor);
               newQuery.equalTo("patient", patient);
               newQuery.equalTo("time", time);
-              newQuery.first({
+              console.log("huaji");
+              newQuery.first({ 
                 success: function success(ret) {
+                  console.log(ret);
                   if (ret === undefined) {
                     var appointment = new Parse.Object("Appointment");
                     appointment.set("doctor", doctor);
@@ -86,6 +93,7 @@ router.post('/appointment', function(req, res) {
                   }
                 },
                 error: function(error) {
+                  console.log("not good");
                   res.status(400).json(error);
                 }
               }); //newQuery.first

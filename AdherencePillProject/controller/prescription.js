@@ -5,6 +5,7 @@
 var checkSession = require('./utility').checkSession;
 var isPatient = require('./utility').isPatient;
 
+
 exports.getBottleInfo = function(req, res) {
     var sessionToken = req.get("x-parse-session-token");
     checkSession(sessionToken, {

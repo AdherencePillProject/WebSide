@@ -287,3 +287,34 @@ exports.addPatientDoctorRelation = function(patient, doctor, callback) {
     }
   })
 }
+
+exports.addPatientDoctorRelationApply = function(patient, doctor, callback) {
+    console.log("appointment in utility");
+    var query = new Parse.Query(Parse.Object.extend("PatientDoctorApplication"));
+    query.equalTo("patient", patient);
+    query.equalTo("doctor", doctor);
+    query.first({
+        success: function(result) {
+            if (result === undefined) {
+                var relation = new Parse.Object("PatientDoctorApplication");
+                relation.set("patient", patient);
+                relation.set("doctor", doctor);
+                relation.save(null, {
+                    success: function(relation) {
+                        return callback.success(relation);
+                    },
+                    error: function(relation, error) {
+                        return callback.error(error);
+                    }
+                });
+            }
+            else {
+                return callback.success(result);
+            }
+
+        },
+        error: function(error) {
+            return callback.error(error);
+        }
+    })
+}

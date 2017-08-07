@@ -289,7 +289,6 @@ exports.addPatientDoctorRelation = function(patient, doctor, callback) {
 }
 
 exports.addPatientDoctorRelationApply = function(patient, doctor, callback) {
-    console.log("appointment in utility");
     var query = new Parse.Query(Parse.Object.extend("PatientDoctorApplication"));
     query.equalTo("patient", patient);
     query.equalTo("doctor", doctor);
@@ -318,3 +317,4 @@ exports.addPatientDoctorRelationApply = function(patient, doctor, callback) {
         }
     })
 }
+

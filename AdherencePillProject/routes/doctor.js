@@ -587,4 +587,34 @@ router.get('/patient/bottles', function(req, res) {
   })
 });
 
+// GET get the doctorApply object of the doctor
+router.get('/DoctorApply', function(req, res, next) {
+  checkSession(req.get("x-parse-session-token"), {
+    success: function success(doctor) {
+      var DoctorApply = Parse.Object.extend("PatientDoctorApplication");
+      query.equalTo("doctor", doctor.id);
+      query.find({
+        success: function(results) {
+          var ret = new Array();
+          for (var i=0; i<results.length; i++) {
+            ret.push({
+              patient: results[i].get("patient")
+            });
+          }
+          res.status(200).json(ret);
+        },
+        error: function(error) {
+          res.status(200).json([]);
+        }
+      })
+      res.status(200).json({code: 1, info: ret});
+    },
+    error: function error(error) {
+      res.status(401)
+          .json({code: error.code, message: error.message});
+    }
+  }); //checkSession
+});
+
+
 module.exports = router;

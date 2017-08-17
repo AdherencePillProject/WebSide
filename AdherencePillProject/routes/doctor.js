@@ -147,12 +147,14 @@ router.post('/patient/prescription', function(req, res, next) {
                       var Prescription = new Parse.Object.extend("Prescription");
                       var prescription = new Prescription();
                       prescription.set("name", req.body.name);
+                      //prescription.set("name", "req.body.namettt");
                       prescription.set("schedule", schedule);
+                      prescription.set("prescriptionId", req.body.prescriptionId);
                       prescription.set("note", req.body.note);
                       prescription.set("doctor", doctor);
                       prescription.set("patient", patient);
                       prescription.set("newAdded", true);
-		      prescription.set("pill", req.body.pillName);
+		                  prescription.set("pill", req.body.pillName);
 
                       //pill should be changed to the bottle.
                       //prescription.set("pill", pill);
@@ -253,8 +255,10 @@ router.get('/patients/prescriptions', function(req, res) {
                     schedules.push(entry);
                   }
                 }
-                console.log("here2");
+                //console.log("here2");
+                //console.log("bottle objId: ", bottles[i].id);
                 var entry = {
+                  objectId: bottles[i].id,
                   name: bottles[i].get("name"),
                   pillNumber: bottles[i].get("pillNumber"),
                   schedules: schedules
@@ -321,14 +325,31 @@ router.get('/patient/prescription', function(req, res, next) {
                 query.equalTo("patient", _patient);
                 query.find({
                   success: function(results) {
+                    console.log("resultsLen:",results.length);
+                    var latestResults = {};
                     var ret = new Array();
-                    for (var i=0; i<results.length; i++) {
+                    //Get latest prescritions from results using hashmap
+                    for (var i = 0; i < results.length; i++) {
+                      if (results[i].get("prescriptionId") in latestResults) {
+                        var previous =  latestResults[results[i].get("prescriptionId")];
+                        if (previous.get("createdAt") < results[i].get("createdAt")) {
+                          latestResults[results[i].get("prescriptionId")] = results[i];
+                        }
+                      } else {
+                        latestResults[results[i].get("prescriptionId")] = results[i];
+                      }
+                    }
+                    
+                    for (var key in latestResults) {
+                      console.log("pill name in this pre:",latestResults[key].get("pill"));
                       ret.push({
-                        id: results[i].id,
-                        name: results[i].get("name"),
-                        pill: results[i].get("bottle"),
-                        note: results[i].get("note"),
-                        times: results[i].get("schedule").get("times")
+                        id: latestResults[key].id,
+                        name: latestResults[key].get("name"),
+                        prescriptionId: latestResults[key].get("prescriptionId"),
+                        pill: latestResults[key].get("bottle"),
+                        pillName: latestResults[key].get("pill"),
+                        note: latestResults[key].get("note"),
+                        times: latestResults[key].get("schedule").get("times")
                       });
                     }
                     res.status(200).json(ret);

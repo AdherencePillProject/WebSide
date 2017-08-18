@@ -11,11 +11,18 @@ function addPerson (userInfo, type, callback) {
     var Person = new Parse.Object.extend(type);
     var newPerson = new Person();
     newPerson.set("user", userInfo.user);
+    console.log("enter addPerson!!!");
+    console.log(userInfo);
     if (type === "Doctor") {
         newPerson.set("hospitalName", userInfo.addtionInfo.hospitalName);
         newPerson.set("hospitalAddress", userInfo.addtionInfo.hospitalAddress);
         newPerson.set("hospitalCity", userInfo.addtionInfo.hospitalCity);
+        newPerson.set("hospitalCountry", userInfo.addtionInfo.hospitalCountry);
+        newPerson.set("hospitalState", userInfo.addtionInfo.hospitalState);
+        newPerson.set("zipCode", userInfo.addtionInfo.zipCode);
     }
+    console.log("new person:");
+    console.log(newPerson);
     newPerson.save(null ,{
         success: function (person) {
             return callback.success(person);

@@ -51,7 +51,7 @@ router.post('/appointment', function(req, res) {
         success: function(doctor) {
           getPatientProfile(user.id, {
             success: function(patient) {
-              console.log("appointment", doctor, patient);
+              // console.log("appointment", doctor, patient);
 
               addPatientDoctorRelationApply(doctor, patient);
 
@@ -325,6 +325,35 @@ router.get('/prescriptions', function(req, res) {
       res.status(400).json(err);
     }
   })
+});
+
+// POST add a doctorApply object to apply matching a doctor
+router.post('/addDoctorApply', function(req, res){
+  checkSession(req.get('x-parse-session-token'), {
+    success: function(user) {
+      console.log("work now!");
+      findDoctor(req.body.doctorId, {
+        success: function(doctor) {
+          getPatientProfile(user.id, {
+            success: function(patient) {
+              // console.log("appointment", doctor, patient);
+              addPatientDoctorRelationApply(doctor, patient);
+            },
+            error: function(error) {
+              res.status(400).json(error);
+            }
+          }); //getPatientProfile
+        },
+        error: function(error) {
+          res.status(400).json(error);
+        }
+      }); //findDoctor
+    },
+    error: function(error) {
+      res.status(401)
+        .json({"code": error.code, "message": error.message});
+    }
+  }); //checkSession
 });
 
 module.exports = router;

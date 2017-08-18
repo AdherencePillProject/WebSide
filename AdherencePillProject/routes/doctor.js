@@ -115,7 +115,6 @@ router.get('/patients', function(req, res, next) {
   });
 });
 
-
 //add a new prescription for a patient
 router.post('/patient/prescription', function(req, res, next) {
   checkSession(req.get("x-parse-session-token"), {

@@ -320,7 +320,7 @@ exports.addBottleUpdate = function(updateItem, callback) {
 
 
 exports.removeUpdate = function(updateItem, callback) {
-    console.log("remove the update");
+    // console.log("remove the update");
 
     var update = new Parse.Object.extend("BottleUpdates");
     var query = new Parse.Query(update);
@@ -358,7 +358,7 @@ exports.removeUpdate = function(updateItem, callback) {
 }
 
 exports.addGameScore = function(callback) {
-    console.log("in utility");
+    // console.log("in utility");
     var Game = Parse.Object.extend("GameScore");
     var game = new Game();
 
@@ -367,10 +367,11 @@ exports.addGameScore = function(callback) {
 
     game.save(null, {
         success: function(update) {
-            console.log("GameScore being saved");
+            // console.log("GameScore being saved");
         },
         error: function(update, err) {
             alert("Data is invalide");
         }
     })
 }
+

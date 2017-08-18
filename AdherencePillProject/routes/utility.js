@@ -295,13 +295,16 @@ exports.addPatientDoctorRelation = function(patient, doctor, callback) {
 }
 
 exports.addPatientDoctorRelationApply = function(patient, doctor, callback) {
-    var query = new Parse.Query(Parse.Object.extend("PatientDoctorApplication"));
+    var query = new Parse.Query(Parse.Object.extend("PatientDoctor"));
     query.equalTo("patient", patient);
     query.equalTo("doctor", doctor);
     query.first({
         success: function(result) {
+            //console.log("result",result);
             if (result === undefined) {
-                var relation = new Parse.Object("PatientDoctorApplication");
+                var relation = new Parse.Object("PatientDoctor");
+                //console.log("patient,", patient);
+                //console.log("doctor,", doctor);
                 relation.set("patient", patient);
                 relation.set("doctor", doctor);
                 relation.save(null, {
@@ -316,7 +319,6 @@ exports.addPatientDoctorRelationApply = function(patient, doctor, callback) {
             else {
                 return callback.success(result);
             }
-
         },
         error: function(error) {
             return callback.error(error);

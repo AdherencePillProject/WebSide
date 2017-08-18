@@ -161,6 +161,53 @@ router.get('/appointment', function(req, res, next) {
   }); //checkSession
 });
 
+/* get list of docotrs for a given patient*/
+router.get('/mydoctors', function(req, res, next) {
+  checkSession(req.get("x-parse-session-token"), {
+    success: function(user) {
+      getPatientProfile(user.id, {
+        success: function(patient) {
+          var patientDoctor = Parse.Object.extend("PatientDoctor");
+          var query = new Parse.Query(patientDoctor);
+          query.select("doctor.user.firstname", "doctor.user.lastname",
+            "doctor.hospitalName", "doctor.hospitalAddress", "doctor.user.phone", "doctor.user.email");
+          query.include("doctor");
+          query.include("doctor.user");
+          // query.ascending("time");
+          query.equalTo("patient", patient);
+          query.find({
+            success: function(results) {
+              var ret = new Array();
+              //console.log("get my doctor:", results);
+              for (var i=0; i<results.length; i++) {
+                ret.push({
+                  doctorFirstName: results[i].get("doctor").get("user").get("firstname"),
+                  doctorLastName: results[i].get("doctor").get("user").get("lastname"),
+                  hospitalName: results[i].get("doctor").get("hospitalName"),
+                  hospitalAddress: results[i].get("doctor").get("hospitalAddress"),
+                  doctorPhone: results[i].get("doctor").get("user").get("phone"),
+                  doctorEmail: results[i].get("doctor").get("user").get("email")
+                });
+              }
+              res.status(200).json(ret);
+            },
+            error: function(error) {
+              res.status(200).json([]);
+            }
+          })
+        },
+        error: function(patient, error) {
+          res.status(400).json(error);
+        }
+      }); //getPatientProfile
+    },
+    error: function(error) {
+      res.status(401)
+        .json({"code": error.code, "message": error.message});
+    }
+  }); //checkSession
+});
+
 /* Get precriptions of a patient */
 router.get('/prescription', function(req, res) {
   checkSession(req.get('x-parse-session-token'), {
@@ -176,13 +223,27 @@ router.get('/prescription', function(req, res) {
           query.find({
             success: function success(prescritions) {
               var ret = new Array();
-              for (var i=0; i<prescritions.length; i++) {
+              //Get latest prescritions from results using hashmap
+              var latestResults = {};
+              for (var i = 0; i < prescritions.length; i++) {
+                if (prescritions[i].get("prescriptionId") in latestResults) {
+                  var previous =  latestResults[prescritions[i].get("prescriptionId")];
+                  if (previous.get("createdAt") < prescritions[i].get("createdAt")) {
+                    latestResults[prescritions[i].get("prescriptionId")] = prescritions[i];
+                  }
+                } else {
+                  latestResults[prescritions[i].get("prescriptionId")] = prescritions[i];
+                }
+              }
+              //console.log("keys:");
+              for (var key in latestResults) {
+                //console.log(key, latestResults[key]);
                 ret.push({
-                  name: prescritions[i].get("name"),
-                  pill: prescritions[i].get("pill"),
-                  note: prescritions[i].get("note"),
-                  schedule: prescritions[i].get("schedule").get("times"),
-                  objectId: prescritions[i].id
+                  name: latestResults[key].get("name"),
+                  pill: latestResults[key].get("pill"),
+                  note: latestResults[key].get("note"),
+                  schedule: latestResults[key].get("schedule").get("times"),
+                  objectId: latestResults[key].id
                 })
               }
               res.status(200).json(ret);
@@ -331,13 +392,13 @@ router.get('/prescriptions', function(req, res) {
 router.post('/addDoctorApply', function(req, res){
   checkSession(req.get('x-parse-session-token'), {
     success: function(user) {
-      console.log("work now!");
       findDoctor(req.body.doctorId, {
         success: function(doctor) {
           getPatientProfile(user.id, {
             success: function(patient) {
               // console.log("appointment", doctor, patient);
-              addPatientDoctorRelationApply(doctor, patient);
+              addPatientDoctorRelationApply(patient, doctor);
+              res.json({"code":200});
             },
             error: function(error) {
               res.status(400).json(error);

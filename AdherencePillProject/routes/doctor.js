@@ -23,6 +23,7 @@ router.get('/', function(req, res, next) {
       Query.notEqualTo("hospitalName", "");
       Query.find({
         success: function(results) {
+          console.log("get doctors,", results);
           results.forEach(function(doctor) {
             // user: doctor;
           });
